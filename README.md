@@ -299,18 +299,4 @@ Additional resources for developers and users:
 - **[Configuration Reference](docs/CONFIGURATION.md)**: Complete environment variable reference
 - **[Lakera Guard Documentation](https://platform.lakera.ai/docs)**: Official Lakera Guard API reference
 
----
-
-## License
-
-This project is licensed under the MIT License. See LICENSE file for details.
-
----
-
-## Support
-
-For issues, questions, or contributions:
-- Open an issue on GitHub
-- Consult the documentation
-- Contact Lakera support for API-related questions
 
