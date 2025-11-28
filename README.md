@@ -79,7 +79,17 @@ Before installation, ensure you have the following:
 - **Optional LLM API Keys**: For OpenAI, Azure OpenAI, or Google Gemini integration
 - **Docker** (optional): For containerized deployment
 
-### Installation
+### CI/CD Pipeline
+
+This project uses GitHub Actions for Continuous Integration and Deployment.
+
+- **Test**: Runs unit tests and linting.
+- **Security**: Scans for vulnerabilities using Trivy.
+- **Build & Push**: Builds Docker image and pushes to GitHub Container Registry (GHCR).
+- **Deploy**: Deploys to the production environment (requires configuration).
+
+### Triggering a Deployment
+Deployments are triggered automatically on pushes to the `main` branch after successful tests and security checks.
 
 #### Standard Installation
 
@@ -146,6 +156,30 @@ For containerized deployment:
    ```bash
    docker run -p 9000:9000 --env-file .env lakera-demo
    ```
+
+### Full Production Environment
+
+For a complete setup with Redis, monitoring, and automated backups:
+
+```bash
+# Start all services
+docker compose -f docker-compose.production.yml up -d
+
+# With production features (Nginx + automated backups)
+docker compose -f docker-compose.production.yml --profile production up -d
+
+# View services
+docker compose -f docker-compose.production.yml ps
+```
+
+**Services included:**
+- Main application with Gunicorn
+- Redis for distributed rate limiting
+- Redis Commander (web UI at http://localhost:8081)
+- Nginx reverse proxy (production profile)
+- Automated backup service (production profile)
+
+See [Production Environment Guide](docs/PRODUCTION_GUIDE.md) for details.
 
 The application will be accessible at `http://localhost:9000`
 
@@ -277,18 +311,6 @@ python -m pytest tests/
 
 ---
 
-## Contributing
-
-We welcome contributions to improve the Lakera Demo platform. Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/enhancement`)
-3. Commit your changes with descriptive messages
-4. Push to your branch (`git push origin feature/enhancement`)
-5. Open a Pull Request with a detailed description
-
----
-
 ## Documentation
 
 Additional resources for developers and users:
@@ -299,4 +321,18 @@ Additional resources for developers and users:
 - **[Configuration Reference](docs/CONFIGURATION.md)**: Complete environment variable reference
 - **[Lakera Guard Documentation](https://platform.lakera.ai/docs)**: Official Lakera Guard API reference
 
+---
+
+## License
+
+This project is licensed under the MIT License. See LICENSE file for details.
+
+---
+
+## Support
+
+For issues, questions, or contributions:
+- Open an issue on GitHub
+- Consult the documentation
+- Contact Lakera support for API-related questions
 
