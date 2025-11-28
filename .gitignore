@@ -10,3 +10,17 @@ backups/
 htmlcov/
 .coverage
 *.egg-info/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# OS Files
+Thumbs.db
+
+# Local Development
+.gemini/
+tmp/

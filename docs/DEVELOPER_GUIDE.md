@@ -145,6 +145,33 @@ You can test the GitHub Actions pipeline locally using [nektos/act](https://gith
     ```
     *Note: Some steps like pushing to GHCR will fail locally without valid credentials/secrets.*
 
+## GitHub Authentication
+
+To interact with the repository (push code, trigger workflows), you need to authenticate with GitHub.
+
+### Option 1: GitHub CLI (Recommended)
+
+If you use **Passkeys** or **2FA**, the easiest method is using the GitHub CLI with a Personal Access Token (PAT).
+
+1.  **Generate a Token**:
+    - Go to [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens).
+    - Generate a new token with `repo`, `read:org`, and `workflow` scopes.
+    - Copy the token.
+
+2.  **Login via CLI**:
+    ```bash
+    gh auth login
+    ```
+    - Select **GitHub.com** -> **HTTPS** -> **Paste an authentication token**.
+    - Paste your token when prompted.
+
+### Option 2: SSH Key
+
+If you prefer SSH:
+1.  Generate a key: `ssh-keygen -t ed25519 -C "your@email.com"`
+2.  Add the public key (`cat ~/.ssh/id_ed25519.pub`) to [GitHub SSH Keys](https://github.com/settings/keys).
+3.  Test connection: `ssh -T git@github.com`
+
 ## Contributing
 
 1.  Fork the repository.
