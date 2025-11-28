@@ -17,15 +17,15 @@ services:
       - LOG_FILENAME=${LOG_FILENAME:-application.log}
       
       # API Keys (from .env)
-      - LAKERA_API_KEY=${LAKERA_API_KEY}
-      - LAKERA_PROJECT_ID=${LAKERA_PROJECT_ID}
+      - LAKERA_API_KEY
+      - LAKERA_PROJECT_ID
       - LAKERA_API_URL=${LAKERA_API_URL:-https://api.lakera.ai/v2/guard}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_KEY
       - OPENAI_API_URL=${OPENAI_API_URL:-https://api.openai.com/v1/chat/completions}
-      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
-      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_API_KEY
+      - AZURE_OPENAI_ENDPOINT
       - AZURE_OPENAI_DEPLOYMENT=${AZURE_OPENAI_DEPLOYMENT:-gpt-4o-mini-2024-07-18}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_API_KEY
       
       # CORS
       - CORS_ORIGINS=${CORS_ORIGINS:-*}

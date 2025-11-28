@@ -7,3 +7,4 @@ flasgger
 gunicorn
 Flask-Limiter
 Flask-CORS
+redis

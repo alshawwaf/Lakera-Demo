@@ -2,9 +2,8 @@
 # Gunicorn startup script with environment-based configuration
 
 # Load environment variables
-set -a
-[ -f .env ] && . .env
-set +a
+# Environment variables are passed by Docker
+
 
 # Set defaults if not provided
 GUNICORN_WORKERS=${GUNICORN_WORKERS:-4}

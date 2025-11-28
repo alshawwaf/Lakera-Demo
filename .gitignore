@@ -1,5 +1,7 @@
 .env
 .venv/
+venv/
+env/
 __pycache__/
 instance/
 logs/
@@ -16,7 +18,6 @@ htmlcov/
 .idea/
 *.swp
 *.swo
-.DS_Store
 
 # OS Files
 Thumbs.db

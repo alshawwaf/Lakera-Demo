@@ -172,6 +172,25 @@ If you prefer SSH:
 2.  Add the public key (`cat ~/.ssh/id_ed25519.pub`) to [GitHub SSH Keys](https://github.com/settings/keys).
 3.  Test connection: `ssh -T git@github.com`
 
+### Troubleshooting Authentication
+
+If you encounter `Authentication failed` or `osxkeychain` errors on Linux:
+
+1.  **Check Credential Helper**:
+    ```bash
+    git config --global credential.helper
+    ```
+    If it says `osxkeychain`, unset it:
+    ```bash
+    git config --global --unset credential.helper
+    ```
+
+2.  **Configure GitHub CLI Helper**:
+    If you are logged in with `gh`, tell git to use it:
+    ```bash
+    gh auth setup-git
+    ```
+
 ## Contributing
 
 1.  Fork the repository.

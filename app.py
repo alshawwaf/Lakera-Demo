@@ -26,6 +26,9 @@ app = Flask(__name__)
 cors_origins = os.getenv('CORS_ORIGINS', '*')
 CORS(app, resources={r"/api/*": {"origins": cors_origins}})
 
+# Enable template auto-reload for development
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 # Configure rate limiting with environment variables
 rate_limit_daily = os.getenv('RATE_LIMIT_DAILY', '200')
 rate_limit_hourly = os.getenv('RATE_LIMIT_HOURLY', '50')
@@ -95,6 +98,13 @@ def health_check():
 MODEL_CACHE = {
     'openai': {'data': None, 'timestamp': None},
     'gemini': {'data': None, 'timestamp': None}
+}
+
+# Global cache for Gemini Client
+GEMINI_CACHE = {
+    'api_key': None,
+    'model_name': None,
+    'model_instance': None
 }
 CACHE_DURATION = timedelta(hours=1)
 
@@ -479,6 +489,8 @@ def analyze():
     use_lakera = data.get('use_lakera', False)
     use_lakera_outbound = data.get('use_lakera_outbound', False)
     
+    print(f"DEBUG: prompt={prompt}, use_lakera={use_lakera}, use_lakera_outbound={use_lakera_outbound}", flush=True)
+    
     if not prompt:
         return jsonify({'error': 'Prompt is required'}), 400
 
@@ -814,9 +826,10 @@ def export_logs_json():
     filename = f"lakera_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     
     response = make_response(json_data)
-    response.headers['Content-Type'] = 'application/json; charset=utf-8'
-    response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    response.headers['Content-Type'] = 'application/json'
     return response
+
 
 @app.route('/api/logs/export/csv', methods=['GET'])
 def export_logs_csv():
