@@ -204,6 +204,7 @@ The application supports the following configuration options via `.env`:
 | `AZURE_OPENAI_DEPLOYMENT` | Azure deployment name | No | `gpt-4o-mini-2024-07-18` |
 | `GEMINI_API_KEY` | Google Gemini API key | No | - |
 | `OLLAMA_API_URL` | Ollama API URL | No | `http://localhost:11434` |
+| `OLLAMA_TIMEOUT` | Ollama request timeout (seconds) | No | `120` |
 | `APP_PORT` | Application port | No | `9000` |
 | `LOGS_DIR` | Log file directory | No | `logs` |
 | `LOG_FILENAME` | Log file name | No | `application.log` |

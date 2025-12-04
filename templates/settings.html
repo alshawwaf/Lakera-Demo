@@ -185,6 +185,28 @@
               The URL of your Ollama instance.
             </p>
           </div>
+
+          <div class="input-wrapper">
+            <label
+              for="ollama_timeout"
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+              "
+              >Ollama Timeout (seconds)</label
+            >
+            <input
+              type="number"
+              id="ollama_timeout"
+              name="ollama_timeout"
+              value="{{ ollama_timeout }}"
+              class="search-input"
+              style="width: 100%; padding: 0.75rem"
+              placeholder="120"
+            />
+          </div>
         </div>
       </div>
 
