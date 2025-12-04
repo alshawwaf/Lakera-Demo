@@ -20,7 +20,6 @@ services:
       - LAKERA_API_KEY
       - LAKERA_PROJECT_ID
       - LAKERA_API_URL=${LAKERA_API_URL:-https://api.lakera.ai/v2/guard}
-      - MANAGEMENT_API_KEY
       - OPENAI_API_KEY
       - OPENAI_API_URL=${OPENAI_API_URL:-https://api.openai.com/v1/chat/completions}
       - AZURE_OPENAI_API_KEY
