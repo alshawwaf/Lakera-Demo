@@ -231,6 +231,7 @@ function renderTrafficFlow(data, useLakera, useLakeraOutbound) {
 
   const azureIcon = `<img src="/static/azure-openai.png" alt="Azure" style="width: 28px; height: 28px; object-fit: contain;">`;
   const geminiIcon = `<img src="/static/gemini-logo.png" alt="Gemini" style="width: 28px; height: 28px; object-fit: contain;">`;
+  const ollamaIcon = `<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h2v2H6zm4-4h8v2h-8zm0 4h5v2h-5z"/></svg>`;
 
   let llmIcon = openaiIcon;
   let llmLabel = "OpenAI";
@@ -241,6 +242,9 @@ function renderTrafficFlow(data, useLakera, useLakeraOutbound) {
   } else if (data.model_provider === "gemini") {
     llmIcon = geminiIcon;
     llmLabel = "Google Gemini";
+  } else if (data.model_provider === "ollama") {
+    llmIcon = ollamaIcon;
+    llmLabel = "Ollama";
   }
 
   const createStep = (id, icon, label, status) => `
@@ -406,6 +410,8 @@ function showStepDetails(stepId, data) {
         title = "Azure OpenAI Response";
       } else if (data.model_provider === "gemini") {
         title = "Google Gemini Response";
+      } else if (data.model_provider === "ollama") {
+        title = "Ollama Response";
       } else {
         title = "OpenAI Response";
       }

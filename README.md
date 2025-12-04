@@ -57,6 +57,7 @@ Lakera Demo is a full-featured web application designed to demonstrate the power
 - **OpenAI**: GPT model integration for response generation
 - **Azure OpenAI**: Enterprise OpenAI deployment support
 - **Google Gemini**: Google's generative AI model support
+- **Ollama**: Local LLM support for privacy-focused testing
 
 ### Security Features
 
@@ -77,6 +78,7 @@ Before installation, ensure you have the following:
 - **Python 3.11 or higher**: Required for application runtime
 - **Lakera Guard API Key**: Obtain from [Lakera Platform](https://platform.lakera.ai)
 - **Optional LLM API Keys**: For OpenAI, Azure OpenAI, or Google Gemini integration
+- **Ollama** (optional): For local LLM testing (requires running instance)
 - **Docker** (optional): For containerized deployment
 
 ### CI/CD Pipeline
@@ -201,6 +203,7 @@ The application supports the following configuration options via `.env`:
 | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL | No | - |
 | `AZURE_OPENAI_DEPLOYMENT` | Azure deployment name | No | `gpt-4o-mini-2024-07-18` |
 | `GEMINI_API_KEY` | Google Gemini API key | No | - |
+| `OLLAMA_API_URL` | Ollama API URL | No | `http://localhost:11434` |
 | `APP_PORT` | Application port | No | `9000` |
 | `LOGS_DIR` | Log file directory | No | `logs` |
 | `LOG_FILENAME` | Log file name | No | `application.log` |

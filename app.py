@@ -97,7 +97,8 @@ def health_check():
 # Global cache for Models
 MODEL_CACHE = {
     'openai': {'data': None, 'timestamp': None},
-    'gemini': {'data': None, 'timestamp': None}
+    'gemini': {'data': None, 'timestamp': None},
+    'ollama': {'data': None, 'timestamp': None}
 }
 
 # Global cache for Gemini Client
@@ -341,6 +342,31 @@ def get_gemini_models():
         print(f"Error fetching Gemini models: {e}")
         return ['gemini-pro', 'gemini-pro-vision', 'gemini-1.5-pro', 'gemini-1.5-flash']
 
+def get_ollama_models():
+    """Helper function to fetch available Ollama models with caching"""
+    ollama_url = get_setting('OLLAMA_API_URL') or os.getenv('OLLAMA_API_URL', 'http://localhost:11434')
+    
+    # Check cache
+    now = datetime.now()
+    if MODEL_CACHE['ollama']['data'] and MODEL_CACHE['ollama']['timestamp']:
+        if now - MODEL_CACHE['ollama']['timestamp'] < CACHE_DURATION:
+            return MODEL_CACHE['ollama']['data']
+
+    try:
+        response = requests.get(f"{ollama_url}/api/tags", timeout=2)
+        if response.status_code == 200:
+            models = response.json().get('models', [])
+            result = sorted([m['name'] for m in models])
+            
+            # Update cache
+            MODEL_CACHE['ollama']['data'] = result
+            MODEL_CACHE['ollama']['timestamp'] = now
+            return result
+        return []
+    except Exception as e:
+        print(f"Error fetching Ollama models: {e}")
+        return []
+
 # Initialize DB
 with app.app_context():
     db.create_all()
@@ -357,8 +383,9 @@ def index():
     azure_deployment = get_setting('AZURE_OPENAI_DEPLOYMENT') or os.getenv('AZURE_OPENAI_DEPLOYMENT', 'gpt-4o-mini-2024-07-18')
     
     gemini_models = get_gemini_models()
+    ollama_models = get_ollama_models()
     
-    return render_template('playground.html', available_models=available_models, azure_deployment=azure_deployment, gemini_models=gemini_models)
+    return render_template('playground.html', available_models=available_models, azure_deployment=azure_deployment, gemini_models=gemini_models, ollama_models=ollama_models)
 
 @app.route('/playground')
 def playground():
@@ -370,8 +397,9 @@ def playground():
     azure_deployment = get_setting('AZURE_OPENAI_DEPLOYMENT') or os.getenv('AZURE_OPENAI_DEPLOYMENT', 'gpt-4o-mini-2024-07-18')
     
     gemini_models = get_gemini_models()
+    ollama_models = get_ollama_models()
     
-    return render_template('playground.html', available_models=available_models, azure_deployment=azure_deployment, gemini_models=gemini_models)
+    return render_template('playground.html', available_models=available_models, azure_deployment=azure_deployment, gemini_models=gemini_models, ollama_models=ollama_models)
 
 @app.route('/dashboard')
 def dashboard():
@@ -391,6 +419,7 @@ def settings():
         azure_openai_endpoint = request.form.get('azure_openai_endpoint')
         azure_openai_deployment = request.form.get('azure_openai_deployment')
         gemini_api_key = request.form.get('gemini_api_key')
+        ollama_api_url = request.form.get('ollama_api_url')
         
         set_setting('LAKERA_API_KEY', api_key)
         set_setting('LAKERA_PROJECT_ID', project_id)
@@ -399,9 +428,11 @@ def settings():
         set_setting('AZURE_OPENAI_ENDPOINT', azure_openai_endpoint)
         set_setting('AZURE_OPENAI_DEPLOYMENT', azure_openai_deployment)
         set_setting('GEMINI_API_KEY', gemini_api_key)
+        set_setting('OLLAMA_API_URL', ollama_api_url)
         
         # Re-fetch models to ensure the list is up-to-date with the new key if changed
         gemini_models = get_gemini_models()
+        ollama_models = get_ollama_models()
 
         return render_template('settings.html', success=True, 
                              api_key=api_key, project_id=project_id, 
@@ -409,7 +440,9 @@ def settings():
                              azure_openai_api_key=azure_openai_api_key, azure_openai_endpoint=azure_openai_endpoint,
                              azure_openai_deployment=azure_openai_deployment,
                              gemini_api_key=gemini_api_key,
-                             gemini_models=gemini_models)
+                             ollama_api_url=ollama_api_url,
+                             gemini_models=gemini_models,
+                             ollama_models=ollama_models)
     
     api_key = get_setting('LAKERA_API_KEY') or os.getenv('LAKERA_API_KEY', '')
     project_id = get_setting('LAKERA_PROJECT_ID') or os.getenv('LAKERA_PROJECT_ID', '')
@@ -418,8 +451,10 @@ def settings():
     azure_openai_endpoint = get_setting('AZURE_OPENAI_ENDPOINT') or os.getenv('AZURE_OPENAI_ENDPOINT', '')
     azure_openai_deployment = get_setting('AZURE_OPENAI_DEPLOYMENT') or os.getenv('AZURE_OPENAI_DEPLOYMENT', 'gpt-4o-mini-2024-07-18')
     gemini_api_key = get_setting('GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY', '')
+    ollama_api_url = get_setting('OLLAMA_API_URL') or os.getenv('OLLAMA_API_URL', 'http://localhost:11434')
 
     gemini_models = get_gemini_models()
+    ollama_models = get_ollama_models()
 
     return render_template('settings.html', 
                          api_key=api_key, project_id=project_id, 
@@ -427,7 +462,9 @@ def settings():
                          azure_openai_api_key=azure_openai_api_key, azure_openai_endpoint=azure_openai_endpoint,
                          azure_openai_deployment=azure_openai_deployment,
                          gemini_api_key=gemini_api_key,
-                         gemini_models=gemini_models)
+                         ollama_api_url=ollama_api_url,
+                         gemini_models=gemini_models,
+                         ollama_models=ollama_models)
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
@@ -454,7 +491,7 @@ def analyze():
               default: false
             model_provider:
               type: string
-              enum: ['openai', 'azure', 'gemini']
+              enum: ['openai', 'azure', 'gemini', 'ollama']
               default: 'azure'
             model_name:
               type: string
@@ -583,6 +620,23 @@ def analyze():
                     openai_response = f"Error calling Gemini: {str(e)}"
             else:
                 openai_response = "Gemini API key not configured."
+
+        elif model_provider == 'ollama':
+            ollama_url = get_setting('OLLAMA_API_URL') or os.getenv('OLLAMA_API_URL', 'http://localhost:11434')
+            try:
+                payload = {
+                    "model": model_name or "llama3",
+                    "prompt": prompt,
+                    "stream": False
+                }
+                response = requests.post(f"{ollama_url}/api/generate", json=payload, timeout=30)
+                if response.status_code == 200:
+                    openai_response = response.json().get('response', '')
+                else:
+                    openai_response = f"Error calling Ollama: {response.text}"
+            except Exception as e:
+                logging.error(f"Ollama API Error: {e}")
+                openai_response = f"Error calling Ollama: {str(e)}"
                 
         else: # Default to OpenAI
             openai_api_key = get_setting('OPENAI_API_KEY') or os.getenv('OPENAI_API_KEY')

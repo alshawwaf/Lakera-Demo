@@ -10,6 +10,16 @@
 .settings-grid .widget-card {
   height: auto;
   min-height: 100%;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+}
+
+.settings-grid .widget-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  border-color: var(--accent-color);
 }
 
 .settings-grid .input-wrapper {
@@ -18,20 +28,22 @@
 
 /* Compact Stacked Cards */
 .stacked-card {
-  padding: 2rem !important;
+  padding: 2rem;
 }
 
 .stacked-card .widget-header {
-  margin-bottom: 1.75rem !important;
-  padding-bottom: 1.25rem !important;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .stacked-card .input-wrapper {
-  margin-bottom: 1.25rem !important;
+  margin-bottom: 1.25rem;
 }
 
 .stacked-card h3 {
-  font-size: 1rem !important;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 /* Threat List Widget */

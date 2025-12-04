@@ -34,6 +34,7 @@
                     <option value="azure" selected>Azure OpenAI</option>
                     <option value="openai">OpenAI</option>
                     <option value="gemini">Google Gemini</option>
+                    <option value="ollama">Ollama</option>
                 </select>
 
                 <select id="model-select" class="styled-select">
@@ -151,7 +152,8 @@
     azure: {
         deployment: "{{ azure_deployment }}"
     },
-    gemini: {{ gemini_models | tojson }}
+    gemini: {{ gemini_models | tojson }},
+    ollama: {{ ollama_models | tojson }}
     };
 </script>
 {% endblock %}
