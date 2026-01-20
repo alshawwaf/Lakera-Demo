@@ -85,41 +85,43 @@
 <!-- Batch Runner Modal -->
 <div id="batch-modal" class="modal hidden">
     <div class="modal-content batch-content">
-        <div class="modal-header">
-            <h3 class="modal-header-title">Automated Security Scan</h3>
-            <button class="close-modal" id="close-batch-modal">&times;</button>
+        <div class="modal-header compact-header batch-header">
+            <div class="compact-header-left">
+                <span class="compact-status-badge" style="--status-color: #3b82f6">
+                    <span class="status-icon">⚡</span>
+                    <span class="status-text" id="batch-status-text">Scanning</span>
+                </span>
+                <span class="batch-counter-badge" id="batch-counter">0 / 0</span>
+            </div>
+            <button class="close-modal-btn" id="close-batch-modal">&times;</button>
         </div>
-        <div class="modal-body">
-            <!-- Progress Section -->
-            <div class="batch-progress-section">
-                <div class="progress-info">
-                    <span id="batch-status-text">Scanning...</span>
-                    <span id="batch-counter">0/0</span>
-                </div>
-                <div class="progress-bar-bg">
-                    <div id="batch-progress-bar" class="progress-bar-fill" style="width: 0%"></div>
+        <div class="modal-body batch-body">
+            <!-- Progress Bar -->
+            <div class="batch-progress-wrapper">
+                <div class="batch-progress-bar">
+                    <div id="batch-progress-bar" class="batch-progress-fill" style="width: 0%"></div>
                 </div>
             </div>
 
-            <!-- Current Item Display -->
-            <div class="current-scan-item">
-                <h4>Current Prompt:</h4>
-                <div id="batch-current-prompt" class="prompt-preview"></div>
+            <!-- Current Prompt -->
+            <div class="batch-current-section">
+                <div class="batch-section-label">Current Prompt</div>
+                <div id="batch-current-prompt" class="batch-prompt-preview"></div>
             </div>
 
-            <!-- Live Log -->
-            <div class="batch-log-container">
-                <h4>Scan Log:</h4>
-                <div id="batch-log-list" class="batch-log-list">
+            <!-- Scan Log -->
+            <div class="batch-log-section">
+                <div class="batch-section-label">Scan Log</div>
+                <div id="batch-log-list" class="batch-log-list-compact">
                     <!-- Log items will appear here -->
                 </div>
             </div>
         </div>
-        <div class="modal-footer batch-controls">
-            <button id="batch-pause-btn" class="secondary-btn">
+        <div class="modal-footer batch-footer">
+            <button id="batch-pause-btn" class="batch-control-btn secondary">
                 <span class="icon">⏸️</span> Pause
             </button>
-            <button id="batch-cancel-btn" class="danger-btn">
+            <button id="batch-cancel-btn" class="batch-control-btn danger">
                 Cancel
             </button>
         </div>

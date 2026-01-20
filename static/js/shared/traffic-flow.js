@@ -24,46 +24,54 @@ export function displayResults(data) {
   const isOutboundFlagged =
     lakeraOutboundResult && lakeraOutboundResult.flagged;
 
-  // --- Header Logic ---
-  let headerClass, headerIcon, headerTitle, headerSubtitle;
+  // --- Compact Header Logic ---
+  let headerClass, statusIcon, statusText, statusColor;
 
   if (!lakeraResult) {
     headerClass = "neutral";
-    headerIcon = "⚪";
-    headerTitle = "Not Scanned";
-    headerSubtitle = "Lakera Guard scan was skipped.";
+    statusIcon = "○";
+    statusText = "Not Scanned";
+    statusColor = "var(--text-secondary)";
   } else if (isFlagged) {
     headerClass = "danger";
-    headerIcon = "🛡️";
-    headerTitle = "Threat Blocked";
-    headerSubtitle = "Lakera Guard intercepted a potential attack.";
+    statusIcon = "⛔";
+    statusText = "Threat Blocked";
+    statusColor = "#ef4444";
   } else if (isOutboundFlagged) {
     headerClass = "warning";
-    headerIcon = "⚠️";
-    headerTitle = "Outbound Threat";
-    headerSubtitle = "Sensitive data detected in response.";
+    statusIcon = "⚠️";
+    statusText = "Outbound Threat";
+    statusColor = "#f97316";
   } else {
     headerClass = "success";
-    headerIcon = "✅";
-    headerTitle = "Request Safe";
-    headerSubtitle = "No threats detected in the request.";
+    statusIcon = "✓";
+    statusText = "Safe";
+    statusColor = "#22c55e";
   }
 
-  modalHeader.className = `modal-header ${headerClass}`;
+  // Provider label
+  let providerLabel = "OpenAI";
+  if (data.model_provider === "azure") providerLabel = "Azure";
+  else if (data.model_provider === "gemini") providerLabel = "Gemini";
+  else if (data.model_provider === "ollama") providerLabel = "Ollama";
+
+  const modelDisplay = data.model_name ? `${providerLabel} · ${data.model_name}` : providerLabel;
+
+  modalHeader.className = `modal-header compact-header ${headerClass}`;
   modalHeader.innerHTML = `
-        <div class="modal-header-content">
-            <div class="modal-status-icon">${headerIcon}</div>
-            <div class="modal-header-text">
-                <h2 class="modal-title">${headerTitle}</h2>
-                <p class="modal-subtitle">${headerSubtitle}</p>
-            </div>
-        </div>
-        <button class="close-modal-btn" id="close-result-modal">&times;</button>
-    `;
+    <div class="compact-header-left">
+      <span class="compact-status-badge" style="--status-color: ${statusColor}">
+        <span class="status-icon">${statusIcon}</span>
+        <span class="status-text">${statusText}</span>
+      </span>
+      <span class="compact-model-badge">${modelDisplay}</span>
+    </div>
+    <button class="close-modal-btn" id="close-result-modal">&times;</button>
+  `;
 
   // --- Traffic Flow Section ---
   const flowCard = document.createElement("div");
-  flowCard.className = "modal-card";
+  flowCard.className = "modal-card compact-flow-card";
 
   const useLakera = document.getElementById("lakera-scan-checkbox").checked;
   const useLakeraOutbound = document.getElementById(
@@ -74,7 +82,7 @@ export function displayResults(data) {
   flowCard.appendChild(flowDiagram);
   flagsContainer.appendChild(flowCard);
 
-  // --- Threats Section (Unified) ---
+  // --- Threats Section (Compact Pills) ---
   const inboundVectors =
     lakeraResult && lakeraResult.attack_vectors
       ? lakeraResult.attack_vectors
@@ -93,35 +101,28 @@ export function displayResults(data) {
   }
 
   if (inboundVectors.length > 0 || outboundVectors.length > 0) {
-    const threatCard = document.createElement("div");
-    threatCard.className = "modal-card";
+    const threatSection = document.createElement("div");
+    threatSection.className = "compact-threat-section";
 
-    const sectionTitle = document.createElement("h4");
-    sectionTitle.className = "modal-section-title";
-    sectionTitle.textContent = "Threats Detected";
-    threatCard.appendChild(sectionTitle);
+    const threatLabel = document.createElement("span");
+    threatLabel.className = "threat-section-label";
+    threatLabel.textContent = "Detected:";
+    threatSection.appendChild(threatLabel);
 
-    const grid = document.createElement("div");
-    grid.className = "attack-types-grid";
-    grid.style.display = "grid";
-    grid.style.gridTemplateColumns = "repeat(auto-fill, minmax(220px, 1fr))";
-    grid.style.gap = "1rem";
-    grid.style.width = "100%";
+    const pillContainer = document.createElement("div");
+    pillContainer.className = "threat-pills";
 
-    // Add Inbound Vectors
-    inboundVectors.forEach((vector) => {
-      const card = createAttackCard(vector);
-      grid.appendChild(card);
+    [...inboundVectors, ...outboundVectors].forEach((vector) => {
+      const pill = document.createElement("span");
+      pill.className = "threat-pill";
+      const color = getAttackColor(vector);
+      pill.style.setProperty("--pill-color", color);
+      pill.textContent = vector.replace(/_/g, " ");
+      pillContainer.appendChild(pill);
     });
 
-    // Add Outbound Vectors
-    outboundVectors.forEach((vector) => {
-      const card = createAttackCard(vector);
-      grid.appendChild(card);
-    });
-
-    threatCard.appendChild(grid);
-    flagsContainer.appendChild(threatCard);
+    threatSection.appendChild(pillContainer);
+    flagsContainer.appendChild(threatSection);
   }
 
   // Add Details Pane Container
@@ -130,28 +131,22 @@ export function displayResults(data) {
   detailsPane.className = "hidden";
   flagsContainer.appendChild(detailsPane);
 
-  // --- OpenAI Response Section ---
+  // --- LLM Response Section ---
   if (data.openai_response) {
-    const responseCard = document.createElement("div");
-    responseCard.className = "modal-card";
+    const responseSection = document.createElement("div");
+    responseSection.className = "compact-response-section";
 
-    // Dynamic title based on provider
-    let providerLabel = "OpenAI";
-    if (data.model_provider === "azure") providerLabel = "Azure OpenAI";
-    else if (data.model_provider === "gemini") providerLabel = "Gemini";
-    else if (data.model_provider === "ollama") providerLabel = "Ollama";
-
-    const sectionTitle = document.createElement("h4");
-    sectionTitle.className = "modal-section-title";
-    sectionTitle.textContent = `${providerLabel} Response`;
-    responseCard.appendChild(sectionTitle);
+    const responseHeader = document.createElement("div");
+    responseHeader.className = "response-header";
+    responseHeader.innerHTML = `<span class="response-label">${providerLabel} Response</span>`;
+    responseSection.appendChild(responseHeader);
 
     const responseBox = document.createElement("div");
-    responseBox.className = "openai-response";
+    responseBox.className = "compact-response-box";
     responseBox.textContent = data.openai_response;
-    responseCard.appendChild(responseBox);
+    responseSection.appendChild(responseBox);
 
-    flagsContainer.appendChild(responseCard);
+    flagsContainer.appendChild(responseSection);
   }
 
   // Re-attach close handler

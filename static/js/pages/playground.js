@@ -382,7 +382,7 @@ export function initPlayground() {
                 // Add to log
                 if (logList) {
                     const logItem = document.createElement("div");
-                    logItem.className = "batch-log-item";
+                    logItem.className = "batch-log-item clickable";
 
                     const isFlagged = result.flagged || (result.attack_vectors && result.attack_vectors.length > 0);
                     const statusIcon = isFlagged ? "⚠️" : "✅";
@@ -396,7 +396,22 @@ export function initPlayground() {
                                 ${isFlagged ? "Threat Detected" : "Safe"}
                             </div>
                         </div>
+                        <span class="batch-log-view">View →</span>
                     `;
+
+                    // Store the result data for click handler
+                    const resultData = {
+                        ...result,
+                        prompt: example.prompt,
+                        model_provider: modelProvider,
+                        model_name: modelName
+                    };
+
+                    logItem.addEventListener("click", () => {
+                        // Show result modal on top (don't hide batch modal)
+                        displayResults(resultData);
+                    });
+
                     logList.insertBefore(logItem, logList.firstChild);
                 }
 

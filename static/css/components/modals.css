@@ -13,6 +13,11 @@
   backdrop-filter: blur(5px);
 }
 
+/* Result modal appears on top of other modals */
+#result-modal {
+  z-index: 1050;
+}
+
 .modal.hidden {
   display: none;
 }
@@ -28,8 +33,10 @@
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   animation: modalSlideIn 0.3s ease-out;
-  display: grid; /* Switched to Grid */
-  grid-template-rows: auto 1fr auto; /* Header, Body, Footer */
+  display: grid;
+  /* Switched to Grid */
+  grid-template-rows: auto 1fr auto;
+  /* Header, Body, Footer */
 }
 
 /* Result Modal Specific Enhancements */
@@ -41,6 +48,152 @@
   border-radius: 12px;
   border: 1px solid var(--border-color);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  z-index: 1010;
+  /* Higher than batch modal */
+}
+
+/* Modal Header - Generic (for Logs, Batch, Confirm) */
+.modal-header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
+}
+
+/* Compact Header for Result Modal */
+.compact-header {
+  padding: 0.875rem 1.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: var(--card-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.compact-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.compact-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--status-color) 15%, transparent);
+  color: var(--status-color);
+  border: 1px solid color-mix(in srgb, var(--status-color) 30%, transparent);
+}
+
+.compact-status-badge .status-icon {
+  font-size: 0.9rem;
+}
+
+.compact-model-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  opacity: 0.7;
+}
+
+/* Compact Flow Card */
+.compact-flow-card {
+  padding: 1rem !important;
+  background: var(--bg-secondary) !important;
+  border-radius: 0.75rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Compact Threat Section */
+.compact-threat-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+.threat-section-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ef4444;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.threat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.threat-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: color-mix(in srgb, var(--pill-color) 18%, transparent);
+  color: var(--pill-color);
+  border: 1px solid color-mix(in srgb, var(--pill-color) 35%, transparent);
+}
+
+/* Compact Response Section */
+.compact-response-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.response-header {
+  padding: 0.625rem 1rem;
+  background: var(--nav-link-hover);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.response-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.compact-response-box {
+  padding: 1rem 1.25rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* Result Modal Specific - Overrides */
+.result-content .modal-body {
+  padding: 1.25rem;
+  background: var(--bg-color);
 }
 
 /* Modal Header - Generic (for Logs, Batch, Confirm) */
@@ -126,45 +279,12 @@
   z-index: 10;
 }
 
-.close-modal-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-}
-
-@keyframes pulseIcon {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.modal-body {
-  padding: 1.5rem;
-  overflow-y: auto !important;
-  min-height: 0;
-}
-
-/* Result Modal Body Enhancement */
-.result-content .modal-body {
-  padding: 2rem;
-  background: var(--bg-color);
-}
-
-/* Result Modal Specific Styles - Removed conflicting block to restore premium design */
-
-.result-description {
-  margin-bottom: 1rem;
+/* Override close button for compact header */
+.compact-header .close-modal-btn {
+  position: static;
+  width: 28px;
+  height: 28px;
   font-size: 1rem;
-  line-height: 1.6;
-}
-
-.modal-header-icon {
-  font-size: 2rem;
-  margin-right: 0.75rem;
-}
-
-.modal-header-title {
-  margin: 0;
-  font-size: 1.5rem;
 }
 
 .modal-header-icon.success,
@@ -214,20 +334,35 @@ pre {
 }
 
 @keyframes danger-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 @keyframes success-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .result-summary {
   margin-bottom: 1.5rem;
 }
 
-.threat-alert, .safe-alert {
+.threat-alert,
+.safe-alert {
   padding: 1.5rem;
   border-radius: 0.75rem;
   margin-bottom: 1.5rem;
@@ -243,13 +378,15 @@ pre {
   border-left: 4px solid #22c55e;
 }
 
-.threat-alert strong, .safe-alert strong {
+.threat-alert strong,
+.safe-alert strong {
   display: block;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
 
-.threat-alert p, .safe-alert p {
+.threat-alert p,
+.safe-alert p {
   margin: 0;
   color: var(--text-secondary);
 }
@@ -425,8 +562,15 @@ pre {
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .openai-response {
@@ -447,103 +591,271 @@ pre {
 }
 
 .attack-types-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-    gap: 1rem !important;
-    margin-top: 1rem;
-    width: 100%;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 1rem !important;
+  margin-top: 1rem;
+  width: 100%;
 }
 
 .attack-type-card {
-    position: relative;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-left: 3px solid var(--attack-color);
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.75rem; /* Even smaller padding */
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 0.5rem; /* Smaller gap */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: default;
-    min-width: 0; 
-    width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--attack-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  /* Even smaller padding */
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.5rem;
+  /* Smaller gap */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+  min-width: 0;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .attack-type-card:hover {
-    background: var(--bg-secondary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--attack-color);
-    border-left-width: 4px;
+  background: var(--bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--attack-color);
+  border-left-width: 4px;
 }
 
 .attack-icon {
-    color: var(--attack-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: drop-shadow(0 0 6px var(--attack-color));
-    flex-shrink: 0;
-    transition: all 0.3s ease;
+  color: var(--attack-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 6px var(--attack-color));
+  flex-shrink: 0;
+  transition: all 0.3s ease;
 }
 
 .attack-type-card:hover .attack-icon {
-    filter: drop-shadow(0 0 10px var(--attack-color));
-    transform: scale(1.05);
+  filter: drop-shadow(0 0 10px var(--attack-color));
+  transform: scale(1.05);
 }
 
 .attack-icon svg {
-    width: 16px; /* Even smaller icon */
-    height: 16px;
+  width: 16px;
+  /* Even smaller icon */
+  height: 16px;
 }
 
 .attack-name {
-    font-size: 0.8rem; /* Smaller font */
-    font-weight: 700;
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+  /* Smaller font */
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Batch Modal Specific */
 .batch-content {
-  width: 600px;
+  width: 550px;
   max-width: 90vw;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  background: var(--bg-color);
 }
 
-.batch-content .modal-body {
-  overflow-y: visible;
+.batch-header {
+  background: var(--card-bg) !important;
+}
+
+.batch-counter-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--nav-link-hover);
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+}
+
+.batch-body {
+  padding: 1.25rem !important;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   min-height: 0;
   flex: 1;
+  overflow: hidden;
 }
 
-.batch-log-container {
+.batch-progress-wrapper {
+  width: 100%;
+}
+
+.batch-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--nav-link-hover);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.batch-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 100px;
+  transition: width 0.3s ease;
+}
+
+.batch-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.batch-current-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.625rem;
+  padding: 0.875rem 1rem;
+}
+
+.batch-prompt-preview {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  max-height: 60px;
+  overflow-y: auto;
+}
+
+.batch-log-section {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
-.batch-log-container h4 {
-  margin: 0 0 0.5rem 0;
-}
-
-.batch-log-list {
+.batch-log-list-compact {
   flex: 1;
   overflow-y: auto;
   background: var(--bg-secondary);
-  border-radius: 0.5rem;
-  padding: 0.5rem;
   border: 1px solid var(--border-color);
-  min-height: 0;
+  border-radius: 0.625rem;
+  padding: 0.5rem;
+  min-height: 120px;
+  max-height: 200px;
+}
+
+.batch-log-list-compact .batch-log-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+  background: transparent;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.batch-log-list-compact .batch-log-item:last-child {
+  border-bottom: none;
+}
+
+.batch-log-list-compact .status-icon {
+  font-size: 0.9rem;
+}
+
+.batch-log-list-compact .prompt {
+  flex: 1;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.batch-log-list-compact .result {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.batch-log-list-compact .result.safe {
+  color: #22c55e;
+}
+
+.batch-log-list-compact .result.flagged {
+  color: #ef4444;
+}
+
+/* Clickable log items */
+.batch-log-item.clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.batch-log-item.clickable:hover {
+  background: var(--nav-link-hover);
+}
+
+.batch-log-view {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-color);
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.batch-log-item.clickable:hover .batch-log-view {
+  opacity: 1;
+}
+
+.batch-footer {
+  padding: 0.875rem 1.25rem !important;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.batch-control-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s;
+}
+
+.batch-control-btn.secondary {
+  background: var(--nav-link-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.batch-control-btn.secondary:hover {
+  background: var(--bg-secondary);
+}
+
+.batch-control-btn.danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.batch-control-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.25);
 }
 
 .prompt-preview {
