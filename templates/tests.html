@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header centered">
+    <h2>Jailbreak Arena</h2>
+    <p>Test Lakera Guard against known attack vectors. Click any example to run it through the security scanner.</p>
+</div>
+
+<div id="examples-container" class="arena-container">
+    <!-- Categories will be populated by JavaScript -->
+</div>
+
+<section id="test-runner-section" class="hidden">
+    <div class="runner-header">
+        <h3>Test Runner</h3>
+        <p>Review and execute the selected attack</p>
+    </div>
+    
+    <div class="test-input-wrapper">
+        <label for="test-prompt">Attack Prompt</label>
+        <textarea id="test-prompt" readonly></textarea>
+    </div>
+    
+    <button id="run-test-btn" class="primary-btn">
+        <span class="btn-text">Run Test</span>
+        <div class="loader hidden"></div>
+    </button>
+
+    <div id="test-results-section" class="results-section hidden">
+        <div class="result-header">
+            <div id="test-status-indicator" class="status-indicator"></div>
+            <h3 id="test-result-title"></h3>
+        </div>
+        <p id="test-result-description"></p>
+        <div id="test-flags-container" class="flags-container"></div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,154 @@
+# Full production-ready environment with all services
+# Usage: docker compose -f docker-compose.production.yml up -d
+
+services:
+  # Main application
+  web:
+    build: .
+    container_name: lakera-demo-app
+    ports:
+      - "${APP_PORT:-9000}:${APP_PORT:-9000}"
+    environment:
+      # Application
+      - APP_PORT=${APP_PORT:-9000}
+      - LOGS_DIR=${LOGS_DIR:-logs}
+      - LOG_FILENAME=${LOG_FILENAME:-application.log}
+      
+      # API Keys (from .env)
+      - LAKERA_API_KEY
+      - LAKERA_PROJECT_ID
+      - LAKERA_API_URL=${LAKERA_API_URL:-https://api.lakera.ai/v2/guard}
+      - OPENAI_API_KEY
+      - OPENAI_API_URL=${OPENAI_API_URL:-https://api.openai.com/v1/chat/completions}
+      - AZURE_OPENAI_API_KEY
+      - AZURE_OPENAI_ENDPOINT
+      - AZURE_OPENAI_DEPLOYMENT=${AZURE_OPENAI_DEPLOYMENT:-gpt-4o-mini-2024-07-18}
+      - GEMINI_API_KEY
+      
+      # CORS
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      
+      # Rate Limiting (using Redis)
+      - RATE_LIMIT_DAILY=${RATE_LIMIT_DAILY:-200}
+      - RATE_LIMIT_HOURLY=${RATE_LIMIT_HOURLY:-50}
+      - RATE_LIMIT_STORAGE=redis://redis:6379/0
+      
+      # Gunicorn
+      - GUNICORN_WORKERS=${GUNICORN_WORKERS:-4}
+      - GUNICORN_TIMEOUT=${GUNICORN_TIMEOUT:-120}
+      - GUNICORN_BIND=0.0.0.0:${APP_PORT:-9000}
+    
+    volumes:
+      - ./instance:/app/instance
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - ./backups:/app/backups
+    
+    depends_on:
+      redis:
+        condition: service_healthy
+    
+    networks:
+      - lakera-network
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT:-9000}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    restart: unless-stopped
+    
+    labels:
+      - "com.lakera.demo=true"
+      - "com.lakera.service=web"
+
+  # Redis for distributed rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: lakera-demo-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - lakera-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      - "com.lakera.demo=true"
+      - "com.lakera.service=redis"
+
+  # Redis Commander - Web UI for Redis
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: lakera-demo-redis-ui
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - lakera-network
+    depends_on:
+      - redis
+    restart: unless-stopped
+    labels:
+      - "com.lakera.demo=true"
+      - "com.lakera.service=redis-ui"
+
+  # Nginx reverse proxy (optional - for production)
+  nginx:
+    image: nginx:alpine
+    container_name: lakera-demo-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+    networks:
+      - lakera-network
+    restart: unless-stopped
+    labels:
+      - "com.lakera.demo=true"
+      - "com.lakera.service=nginx"
+    profiles:
+      - production
+
+  # Automated backup service
+  backup:
+    build: .
+    container_name: lakera-demo-backup
+    command: >
+      sh -c "while true; do
+        python scripts/backup_db.py;
+        sleep 86400;
+      done"
+    volumes:
+      - ./instance:/app/instance
+      - ./backups:/app/backups
+    networks:
+      - lakera-network
+    restart: unless-stopped
+    labels:
+      - "com.lakera.demo=true"
+      - "com.lakera.service=backup"
+    profiles:
+      - production
+
+networks:
+  lakera-network:
+    driver: bridge
+    name: lakera-network
+
+volumes:
+  redis-data:
+    name: lakera-demo-redis-data

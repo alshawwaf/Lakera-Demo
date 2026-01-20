@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="logs-container">
+    <!-- Recent Scans Table -->
+    <div class="table-section">
+        <div class="table-header">
+            <h3>Recent Scans</h3>
+            <div class="controls">
+                <input type="date" id="start-date" class="date-input">
+                <span class="separator">to</span>
+                <input type="date" id="end-date" class="date-input">
+                <button id="filter-btn" class="btn-gradient">Filter</button>
+                <button id="export-json-btn" class="btn-gradient">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export JSON
+                </button>
+                <button id="export-csv-btn" class="btn-gradient">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export CSV
+                </button>
+                <button id="clear-all-btn" class="danger-btn">Clear All</button>
+            </div>
+        </div>
+        <div class="search-container">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="log-search" class="search-input" placeholder="Search by prompt or attack type...">
+        </div>
+        <div class="table-container">
+            <table id="logs-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Prompt</th>
+                        <th>Status</th>
+                        <th>Attack Types</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination-controls">
+            <div class="pagination-info">
+                <span id="pagination-info-text">Showing 0-0 of 0 logs</span>
+            </div>
+            <div class="pagination-buttons">
+                <button id="first-page-btn" class="pagination-btn" title="First Page">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="11 17 6 12 11 7"></polyline>
+                        <polyline points="18 17 13 12 18 7"></polyline>
+                    </svg>
+                </button>
+                <button id="prev-page-btn" class="pagination-btn" title="Previous Page">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <span id="page-indicator">Page 1 of 1</span>
+                <button id="next-page-btn" class="pagination-btn" title="Next Page">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <button id="last-page-btn" class="pagination-btn" title="Last Page">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="13 17 18 12 13 7"></polyline>
+                        <polyline points="6 17 11 12 6 7"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div class="per-page-selector">
+                <label for="per-page-select">Logs per page:</label>
+                <select id="per-page-select" class="per-page-select">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Details Modal -->
+<div id="log-modal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Log Details</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="log-section">
+                <h4>Request Payload</h4>
+                <pre id="modal-request"></pre>
+            </div>
+            <div class="log-section">
+                <h4>Response / Result</h4>
+                <pre id="modal-response"></pre>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmation-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>Confirm Action</h3>
+            <button class="close-modal" id="close-confirm-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="confirmation-message">Are you sure you want to proceed?</p>
+        </div>
+        <div class="modal-footer">
+            <button id="confirm-cancel-btn" class="secondary-btn">Cancel</button>
+            <button id="confirm-ok-btn" class="danger-btn">Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="swagger-wrapper" style="padding: 20px; background: white; height: 100%; overflow-y: auto;">
+    <div id="swagger-ui"></div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+<script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+<script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
+
+<style>
+    /* Hide the Base URL text */
+    .swagger-ui .info .base-url {
+        display: none !important;
+    }
+    /* Hide the top bar */
+    .swagger-ui .topbar {
+        display: none !important;
+    }
+    /* Hide Info section (Title, Description, Version) */
+    .swagger-ui .info {
+        display: none !important;
+    }
+    /* Hide Scheme container (Schemes, Authorize) */
+    .swagger-ui .scheme-container {
+        display: none !important;
+    }
+    /* Adjust container */
+    .swagger-ui .wrapper {
+        padding: 0;
+    }
+    
+    /* Dark Theme Overrides - Only apply when NOT in light mode */
+    :root:not([data-theme="light"]) .swagger-wrapper {
+        background-color: #0d1117 !important;
+        color: #c9d1d9;
+    }
+    :root:not([data-theme="light"]) .swagger-ui {
+        color: #c9d1d9;
+    }
+    :root:not([data-theme="light"]) .swagger-ui .info .title, 
+    :root:not([data-theme="light"]) .swagger-ui .info .title small,
+    :root:not([data-theme="light"]) .swagger-ui .info .description,
+    :root:not([data-theme="light"]) .swagger-ui .scheme-container,
+    :root:not([data-theme="light"]) .swagger-ui .opblock-tag,
+    :root:not([data-theme="light"]) .swagger-ui .opblock .opblock-summary-operation-id, 
+    :root:not([data-theme="light"]) .swagger-ui .opblock .opblock-summary-path, 
+    :root:not([data-theme="light"]) .swagger-ui .opblock .opblock-summary-path__deprecated, 
+    :root:not([data-theme="light"]) .swagger-ui .opblock .opblock-summary-description,
+    :root:not([data-theme="light"]) .swagger-ui .opblock-description-wrapper p, 
+    :root:not([data-theme="light"]) .swagger-ui .opblock-external-docs-wrapper p, 
+    :root:not([data-theme="light"]) .swagger-ui .opblock-title_normal p,
+    :root:not([data-theme="light"]) .swagger-ui table thead tr td, 
+    :root:not([data-theme="light"]) .swagger-ui table thead tr th,
+    :root:not([data-theme="light"]) .swagger-ui .response-col_status, 
+    :root:not([data-theme="light"]) .swagger-ui .response-col_links,
+    :root:not([data-theme="light"]) .swagger-ui .parameter__name, 
+    :root:not([data-theme="light"]) .swagger-ui .parameter__type, 
+    :root:not([data-theme="light"]) .swagger-ui .parameter__deprecated, 
+    :root:not([data-theme="light"]) .swagger-ui .parameter__in,
+    :root:not([data-theme="light"]) .swagger-ui .tab li,
+    :root:not([data-theme="light"]) .swagger-ui .btn {
+        color: #c9d1d9 !important;
+    }
+    
+    :root:not([data-theme="light"]) .swagger-ui .scheme-container {
+        background: #161b22;
+        box-shadow: none;
+        border-bottom: 1px solid #30363d;
+    }
+    
+    :root:not([data-theme="light"]) .swagger-ui select {
+        background: #0d1117;
+        color: #c9d1d9;
+        border: 1px solid #30363d;
+    }
+    
+    :root:not([data-theme="light"]) .swagger-ui .opblock .opblock-section-header {
+        background: #161b22;
+        color: #c9d1d9;
+    }
+    
+    :root:not([data-theme="light"]) .swagger-ui .opblock .opblock-summary {
+        border-color: #30363d;
+    }
+    
+    :root:not([data-theme="light"]) .swagger-ui .opblock {
+        border-color: #30363d;
+        background: #0d1117;
+    }
+    
+    /* Method colors - keep them distinct but readable */
+    :root:not([data-theme="light"]) .swagger-ui .opblock.opblock-post { background: rgba(73, 204, 144, 0.1); border-color: #49cc90; }
+    :root:not([data-theme="light"]) .swagger-ui .opblock.opblock-post .opblock-summary { border-color: #49cc90; }
+    
+    :root:not([data-theme="light"]) .swagger-ui .opblock.opblock-get { background: rgba(97, 175, 254, 0.1); border-color: #61affe; }
+    :root:not([data-theme="light"]) .swagger-ui .opblock.opblock-get .opblock-summary { border-color: #61affe; }
+    
+    :root:not([data-theme="light"]) .swagger-ui .opblock.opblock-delete { background: rgba(249, 62, 62, 0.1); border-color: #f93e3e; }
+    :root:not([data-theme="light"]) .swagger-ui .opblock.opblock-delete .opblock-summary { border-color: #f93e3e; }
+    
+    /* Inputs and Models */
+    :root:not([data-theme="light"]) .swagger-ui input[type=email], 
+    :root:not([data-theme="light"]) .swagger-ui input[type=file], 
+    :root:not([data-theme="light"]) .swagger-ui input[type=password], 
+    :root:not([data-theme="light"]) .swagger-ui input[type=search], 
+    :root:not([data-theme="light"]) .swagger-ui input[type=text], 
+    :root:not([data-theme="light"]) .swagger-ui textarea {
+        background: #0d1117;
+        color: #c9d1d9;
+        border: 1px solid #30363d;
+    }
+    
+    :root:not([data-theme="light"]) .swagger-ui .model {
+        color: #c9d1d9;
+    }
+    :root:not([data-theme="light"]) .swagger-ui section.models {
+        border: 1px solid #30363d;
+    }
+    :root:not([data-theme="light"]) .swagger-ui section.models h4 {
+        color: #c9d1d9;
+        border-bottom: 1px solid #30363d;
+    }
+    :root:not([data-theme="light"]) .swagger-ui .model-box {
+        background: #0d1117;
+    }
+</style>
+
+<script>
+window.onload = function() {
+  const ui = SwaggerUIBundle({
+    url: "{{ url_for('flasgger.apispec_1') }}",
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "BaseLayout"
+  });
+  window.ui = ui;
+};
+</script>
+{% endblock %}

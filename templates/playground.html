@@ -1,0 +1,159 @@
+{% extends "base.html" %} {% block content %}
+
+
+<div class="playground-container">
+    <!-- Left Panel: Free-form Input -->
+    <div class="input-panel">
+        <div class="panel-header">
+            <h3>Chat Playground</h3>
+            <p>Enter any prompt to chat with OpenAI</p>
+        </div>
+
+        <div class="input-wrapper">
+            <div class="scan-options" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 2rem;">
+                <!-- Lakera Inbound Toggle -->
+                <div class="toggle-container">
+                    <input type="checkbox" id="lakera-scan-checkbox" class="toggle-input">
+                    <label for="lakera-scan-checkbox" class="toggle-label">
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text">Lakera Inbound Scan</span>
+                    </label>
+                </div>
+
+                <!-- Lakera Outbound Toggle -->
+                <div class="toggle-container">
+                    <input type="checkbox" id="lakera-outbound-checkbox" class="toggle-input">
+                    <label for="lakera-outbound-checkbox" class="toggle-label">
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text">Lakera Outbound Scan</span>
+                    </label>
+                </div>
+            </div>
+            <div style="flex: 1; display: flex; gap: 0.5rem;">
+                <select id="provider-select" class="styled-select">
+                    <option value="azure" selected>Azure OpenAI</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="gemini">Google Gemini</option>
+                    <option value="ollama">Ollama</option>
+                </select>
+
+                <select id="model-select" class="styled-select">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+            <button id="set-default-btn" class="secondary-btn" style="padding: 0.75rem 1rem;"
+                title="Save as default preference">
+                Set as Default
+            </button>
+        </div>
+        <textarea id="prompt" placeholder="Enter a prompt..."></textarea>
+        <div class="input-footer">
+            <span class="char-count">0 characters</span>
+            <button id="analyze-btn" class="btn-gradient">
+                <span class="btn-text">Scan Input</span>
+                <div class="loader hidden"></div>
+            </button>
+        </div>
+    </div>
+
+<!-- Right Panel: Attack Examples -->
+<div class="examples-panel">
+    <div class="panel-header" style="display: flex; align-items: center; justify-content: space-between;">
+        <h2>Trigger Library</h2>
+        <button id="run-all-btn" class="btn-gradient">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                style="margin-right: 0.5rem;">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Run All Triggers
+        </button>
+    </div>
+    <div class="search-container">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="example-search" placeholder="Search triggers..." class="search-input">
+    </div>
+    <div id="examples-list" class="examples-list">
+        <!-- Examples will be populated here -->
+    </div>
+</div>
+</div>
+
+<!-- Batch Runner Modal -->
+<div id="batch-modal" class="modal hidden">
+    <div class="modal-content batch-content">
+        <div class="modal-header">
+            <h3 class="modal-header-title">Automated Security Scan</h3>
+            <button class="close-modal" id="close-batch-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Progress Section -->
+            <div class="batch-progress-section">
+                <div class="progress-info">
+                    <span id="batch-status-text">Scanning...</span>
+                    <span id="batch-counter">0/0</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="batch-progress-bar" class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Current Item Display -->
+            <div class="current-scan-item">
+                <h4>Current Prompt:</h4>
+                <div id="batch-current-prompt" class="prompt-preview"></div>
+            </div>
+
+            <!-- Live Log -->
+            <div class="batch-log-container">
+                <h4>Scan Log:</h4>
+                <div id="batch-log-list" class="batch-log-list">
+                    <!-- Log items will appear here -->
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer batch-controls">
+            <button id="batch-pause-btn" class="secondary-btn">
+                <span class="icon">⏸️</span> Pause
+            </button>
+            <button id="batch-cancel-btn" class="danger-btn">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Results Modal -->
+<div id="result-modal" class="modal hidden">
+    <div class="modal-content result-content">
+        <div class="modal-header">
+            <div class="modal-header-left">
+                <span id="result-icon" class="modal-header-icon"></span>
+                <h3 id="result-title" class="modal-header-title"></h3>
+            </div>
+            <button class="close-modal" id="close-result-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="result-summary">
+                <p id="result-description" class="result-description"></p>
+            </div>
+            <div id="flags-container" class="flags-container"></div>
+            <div id="result-stats" class="result-stats"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.llmData = {
+        openai: {{ available_models | tojson }},
+    azure: {
+        deployment: "{{ azure_deployment }}"
+    },
+    gemini: {{ gemini_models | tojson }},
+    ollama: {{ ollama_models | tojson }}
+    };
+</script>
+{% endblock %}

@@ -1,0 +1,144 @@
+/* Traffic Flow Visualization */
+.traffic-flow-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 2rem;
+  background: var(--nav-link-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  position: relative;
+}
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transform: translateY(-2px);
+  min-width: 80px;
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+.flow-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  animation: pulse-glow 2s infinite;
+  order: 2; /* Place icon below label */
+}
+
+.flow-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  order: 1; /* Place label above icon */
+  white-space: nowrap;
+}
+
+.flow-arrow {
+  flex: 1;
+  height: 3px;
+  background: rgba(59, 130, 246, 0.3);
+  margin: 0 0.5rem;
+  margin-top: 1.5rem; /* Push down to align with icons */
+  position: relative;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+}
+
+.flow-arrow::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 10px solid rgba(59, 130, 246, 0.5);
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.3));
+}
+
+.flow-arrow.active {
+  background: var(--accent-color);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+}
+
+.flow-arrow.active::after {
+  border-left-color: var(--accent-color);
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.8));
+}
+
+.flow-arrow.path-selected {
+  background: #ef4444 !important; /* Red */
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6) !important;
+}
+
+.flow-arrow.path-selected::after {
+  border-left-color: #ef4444 !important;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)) !important;
+}
+
+/* Danger state for arrows leading to blocked steps */
+.flow-arrow.danger {
+  background: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+.flow-arrow.danger::after {
+  border-left-color: #ef4444;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8));
+}
+
+.flow-step.success .flow-icon {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.flow-step.danger .flow-icon {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+  /* Add a prominent red circle effect */
+  outline: 3px solid #ef4444;
+  outline-offset: 4px;
+}
+
+.flow-step.warning .flow-icon {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+/* Skipped and neutral steps - visually disabled */
+.flow-step.skipped .flow-icon,
+.flow-step.neutral .flow-icon {
+  background: rgba(100, 116, 139, 0.1);
+  border-color: rgba(148, 163, 184, 0.3);
+  color: var(--text-secondary);
+  box-shadow: none;
+  opacity: 0.5;
+}
+
+.flow-step.skipped,
+.flow-step.neutral {
+  opacity: 0.6;
+}

@@ -1,0 +1,10 @@
+Flask
+python-dotenv
+requests
+Flask-SQLAlchemy
+google-generativeai
+flasgger
+gunicorn
+Flask-Limiter
+Flask-CORS
+redis

@@ -1,0 +1,317 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="dashboard-wrapper">
+  {% if success %}
+  <div
+    class="alert success"
+    style="
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    "
+  >
+    <span style="font-size: 1.2rem">✓</span> Settings saved successfully
+  </div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('settings') }}" class="settings-form">
+    <div class="settings-grid">
+      <!-- Column 1: Lakera -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <h3>Lakera Configuration</h3>
+        </div>
+
+        <div class="input-wrapper" style="margin-bottom: 1.5rem">
+          <label
+            for="api_key"
+            style="
+              display: block;
+              margin-bottom: 0.5rem;
+              color: var(--text-secondary);
+              font-size: 0.9rem;
+            "
+            >Lakera API Key</label
+          >
+          <input
+            type="password"
+            id="api_key"
+            name="api_key"
+            value="{{ api_key }}"
+            class="search-input"
+            style="width: 100%; padding: 0.75rem"
+            placeholder="Enter your API Key"
+          />
+          <p
+            style="
+              margin-top: 0.5rem;
+              font-size: 0.8rem;
+              color: var(--text-secondary);
+            "
+          >
+            Your API key is stored securely in the local database.
+          </p>
+        </div>
+
+        <div class="input-wrapper">
+          <label
+            for="project_id"
+            style="
+              display: block;
+              margin-bottom: 0.5rem;
+              color: var(--text-secondary);
+              font-size: 0.9rem;
+            "
+            >Project ID</label
+          >
+          <input
+            type="text"
+            id="project_id"
+            name="project_id"
+            value="{{ project_id }}"
+            class="search-input"
+            style="width: 100%; padding: 0.75rem"
+            placeholder="Enter your Project ID"
+          />
+        </div>
+      </div>
+
+      <!-- Column 2: Gemini & OpenAI Stacked -->
+      <div style="display: flex; flex-direction: column; gap: 2.5rem">
+        <!-- Google Gemini Card -->
+        <div class="widget-card stacked-card">
+          <div class="widget-header">
+            <div style="display: flex; align-items: center; gap: 0.75rem">
+              <img
+                src="/static/gemini-logo.png"
+                alt="Google Gemini"
+                style="width: 24px; height: 24px; object-fit: contain"
+              />
+              <h3>Google Gemini Configuration</h3>
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <label
+              for="gemini_api_key"
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+              "
+              >Gemini API Key</label
+            >
+            <input
+              type="password"
+              id="gemini_api_key"
+              name="gemini_api_key"
+              value="{{ gemini_api_key }}"
+              class="search-input"
+              style="width: 100%; padding: 0.75rem"
+              placeholder="Enter your Google Gemini API Key"
+            />
+          </div>
+        </div>
+
+        <!-- OpenAI Card -->
+        <div class="widget-card stacked-card">
+          <div class="widget-header">
+            <h3>OpenAI Configuration</h3>
+          </div>
+
+          <div class="input-wrapper">
+            <label
+              for="openai_api_key"
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+              "
+              >OpenAI API Key</label
+            >
+            <input
+              type="password"
+              id="openai_api_key"
+              name="openai_api_key"
+              value="{{ openai_api_key }}"
+              class="search-input"
+              style="width: 100%; padding: 0.75rem"
+              placeholder="Enter your OpenAI API Key"
+            />
+          </div>
+        </div>
+
+        <!-- Ollama Card -->
+        <div class="widget-card stacked-card">
+          <div class="widget-header">
+            <h3>Ollama Configuration</h3>
+          </div>
+
+          <div class="input-wrapper">
+            <label
+              for="ollama_api_url"
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+              "
+              >Ollama API URL</label
+            >
+            <input
+              type="text"
+              id="ollama_api_url"
+              name="ollama_api_url"
+              value="{{ ollama_api_url }}"
+              class="search-input"
+              style="width: 100%; padding: 0.75rem"
+              placeholder="http://localhost:11434"
+            />
+            <p
+              style="
+                margin-top: 0.5rem;
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+              "
+            >
+              The URL of your Ollama instance.
+            </p>
+          </div>
+
+          <div class="input-wrapper">
+            <label
+              for="ollama_timeout"
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+              "
+              >Ollama Timeout (seconds)</label
+            >
+            <input
+              type="number"
+              id="ollama_timeout"
+              name="ollama_timeout"
+              value="{{ ollama_timeout }}"
+              class="search-input"
+              style="width: 100%; padding: 0.75rem"
+              placeholder="120"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Azure OpenAI -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem">
+            <img
+              src="/static/azure-openai.png"
+              alt="Azure OpenAI"
+              style="width: 24px; height: 24px; object-fit: contain"
+            />
+            <h3>Azure OpenAI Configuration</h3>
+          </div>
+        </div>
+
+        <div class="input-wrapper" style="margin-bottom: 1.5rem">
+          <label
+            for="azure_openai_api_key"
+            style="
+              display: block;
+              margin-bottom: 0.5rem;
+              color: var(--text-secondary);
+              font-size: 0.9rem;
+            "
+            >Azure OpenAI API Key</label
+          >
+          <input
+            type="password"
+            id="azure_openai_api_key"
+            name="azure_openai_api_key"
+            value="{{ azure_openai_api_key }}"
+            class="search-input"
+            style="width: 100%; padding: 0.75rem"
+            placeholder="Enter your Azure OpenAI API Key"
+          />
+        </div>
+
+        <div class="input-wrapper" style="margin-bottom: 1.5rem">
+          <label
+            for="azure_openai_endpoint"
+            style="
+              display: block;
+              margin-bottom: 0.5rem;
+              color: var(--text-secondary);
+              font-size: 0.9rem;
+            "
+            >Azure OpenAI Endpoint</label
+          >
+          <input
+            type="text"
+            id="azure_openai_endpoint"
+            name="azure_openai_endpoint"
+            value="{{ azure_openai_endpoint }}"
+            class="search-input"
+            style="width: 100%; padding: 0.75rem"
+            placeholder="https://your-resource.openai.azure.com/"
+          />
+          <p
+            style="
+              margin-top: 0.5rem;
+              font-size: 0.8rem;
+              color: var(--text-secondary);
+            "
+          >
+            The endpoint URL for your Azure OpenAI resource.
+          </p>
+        </div>
+
+        <div class="input-wrapper">
+          <label
+            for="azure_openai_deployment"
+            style="
+              display: block;
+              margin-bottom: 0.5rem;
+              color: var(--text-secondary);
+              font-size: 0.9rem;
+            "
+            >Azure OpenAI Deployment Name</label
+          >
+          <input
+            type="text"
+            id="azure_openai_deployment"
+            name="azure_openai_deployment"
+            value="{{ azure_openai_deployment }}"
+            class="search-input"
+            style="width: 100%; padding: 0.75rem"
+            placeholder="e.g., gpt-4o-mini-2024-07-18"
+          />
+          <p
+            style="
+              margin-top: 0.5rem;
+              font-size: 0.8rem;
+              color: var(--text-secondary);
+            "
+          >
+            The name of your model deployment in Azure OpenAI Studio.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions" style="display: flex; justify-content: flex-end">
+      <button type="submit" class="btn-gradient">Save Changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

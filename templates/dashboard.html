@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="dashboard-main-grid" id="dashboard-content">
+        <!-- Hero Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon scans">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Scans</span>
+                    <h3 class="stat-value" id="total-scans">0</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blocked">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Threats Blocked</span>
+                    <h3 class="stat-value" id="threats-blocked">0</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rate">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Block Rate</span>
+                    <h3 class="stat-value" id="success-rate">0%</h3>
+                </div>
+            </div>
+            <!-- Actions Card -->
+            <div class="stat-card actions-card" style="justify-content: center; gap: 1rem;">
+                <button id="refresh-btn" class="action-btn secondary" title="Refresh Data">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                </button>
+                <button id="export-pdf" class="action-btn primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Charts Row (Side by Side) -->
+        <div class="charts-row">
+            <!-- Threat Distribution Chart -->
+            <div class="chart-card">
+                <h3>Threat Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="threatChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Scan Activity Chart -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3>Scan Activity</h3>
+                    <div class="chart-controls">
+                        <select id="timeline-range" class="styled-select" style="width: auto; padding-right: 2.5rem;">
+                            <option value="1h">Last 1 Hour</option>
+                            <option value="24h" selected>Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Feed (Full Width) -->
+        <div class="feed-section">
+            <div class="feed-header">
+                <h3>Live Security Feed</h3>
+                <div class="live-indicator">
+                    <div class="pulse"></div>
+                    Live
+                </div>
+            </div>
+            <div class="feed-list" id="feed-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% endblock %}

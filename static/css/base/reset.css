@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  background-image: radial-gradient(
+    circle at top center,
+    #1e293b 0%,
+    #0f172a 100%
+  );
+  color: var(--text-primary);
+  min-height: 100vh;
+}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div>
+            <h2>Live Monitor</h2>
+            <p>Real-time logs of all security checks performed by the system.</p>
+        </div>
+        <div class="controls">
+            <input type="date" id="start-date" class="date-input">
+            <span class="separator">to</span>
+            <input type="date" id="end-date" class="date-input">
+            <button id="filter-btn" class="secondary-btn">Filter</button>
+            <button id="clear-all-btn" class="danger-btn">Clear All</button>
+            <button id="refresh-logs" class="icon-btn" title="Refresh Logs">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<section class="monitoring-section">
+    <div class="table-container">
+        <table id="logs-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Prompt</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Logs will be populated here -->
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Log Details Modal -->
+<div id="log-modal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Log Details</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="log-section">
+                <h4>Request</h4>
+                <pre><code id="modal-request"></code></pre>
+            </div>
+            <div class="log-section">
+                <h4>Response</h4>
+                <pre><code id="modal-response"></code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

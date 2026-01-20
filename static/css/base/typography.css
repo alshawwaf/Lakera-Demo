@@ -1,0 +1,17 @@
+/* Typography */
+h1,
+h2,
+h3,
+h4 {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.centered {
+  text-align: center;
+}
