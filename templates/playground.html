@@ -34,7 +34,7 @@
                     <option value="azure" selected>Azure OpenAI</option>
                     <option value="openai">OpenAI</option>
                     <option value="gemini">Google Gemini</option>
-                    <option value="ollama">Ollama</option>
+                    <option value="ollama">Ollama (Local LLMs)</option>
                 </select>
 
                 <select id="model-select" class="styled-select">
@@ -43,7 +43,7 @@
             </div>
             <button id="set-default-btn" class="secondary-btn" style="padding: 0.75rem 1rem;"
                 title="Save as default preference">
-                Set as Default
+                Set as Default LLM
             </button>
         </div>
         <textarea id="prompt" placeholder="Enter a prompt..."></textarea>
@@ -56,30 +56,30 @@
         </div>
     </div>
 
-<!-- Right Panel: Attack Examples -->
-<div class="examples-panel">
-    <div class="panel-header" style="display: flex; align-items: center; justify-content: space-between;">
-        <h2>Trigger Library</h2>
-        <button id="run-all-btn" class="btn-gradient">
+    <!-- Right Panel: Attack Examples -->
+    <div class="examples-panel">
+        <div class="panel-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <h2>Trigger Library</h2>
+            <button id="run-all-btn" class="btn-gradient">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-right: 0.5rem;">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Run All Triggers
+            </button>
+        </div>
+        <div class="search-container">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                style="margin-right: 0.5rem;">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                class="search-icon">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            Run All Triggers
-        </button>
+            <input type="text" id="example-search" placeholder="Search triggers..." class="search-input">
+        </div>
+        <div id="examples-list" class="examples-list">
+            <!-- Examples will be populated here -->
+        </div>
     </div>
-    <div class="search-container">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            class="search-icon">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" id="example-search" placeholder="Search triggers..." class="search-input">
-    </div>
-    <div id="examples-list" class="examples-list">
-        <!-- Examples will be populated here -->
-    </div>
-</div>
 </div>
 
 <!-- Batch Runner Modal -->

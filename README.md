@@ -313,6 +313,20 @@ python -m pytest tests/
 - **JavaScript**: Use ES6+ features, 4-space indentation
 - **CSS**: Modular architecture with BEM naming convention
 
+### VS Code Configuration
+
+This project includes VS Code settings to properly handle Jinja templates:
+
+**Included Configuration (`.vscode/settings.json`):**
+- Associates `.html` files with Jinja-HTML language mode
+- Disables auto-formatting for Jinja templates to prevent syntax corruption
+- Enables Emmet support in Jinja-HTML files
+
+**Recommended Extension:**
+- **[Jinja HTML](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml)**: Provides syntax highlighting for Jinja2 templates
+
+> **Note**: The VS Code HTML formatter may add spaces inside `{{ }}` Jinja brackets, breaking template syntax. The included settings prevent this by using Jinja-HTML mode.
+
 ---
 
 ## Documentation
