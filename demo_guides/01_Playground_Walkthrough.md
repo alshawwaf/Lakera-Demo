@@ -1,13 +1,13 @@
 # Guide 1: Playground Walkthrough
 
-This guide introduces the core interactive experience of the Lakera Demo: the Playground. Here, you can simulate real-world AI interactions and see Lakera Guard in action.
+This guide introduces the core interactive experience of the Lakera Demo: the Playground. Here, you can simulate real-world AI interactions and see Lakera Demo in action.
 
 ## 1. Interface Overview
 
 The Playground is divided into two main panels:
 
 *   **Left Panel (Input)**: This is where you interact with the LLM.
-    *   **Scan Options**: Toggles to enable/disable Lakera Guard for inbound (prompt) and outbound (response) traffic.
+    *   **Scan Options**: Toggles to enable/disable Lakera Demo for inbound (prompt) and outbound (response) traffic.
     *   **Provider & Model**: Dropdowns to select your LLM provider (OpenAI, Azure, Gemini, Ollama) and specific model.
     *   **Prompt Area**: A text box to enter your prompt.
     *   **Scan Input Button**: Initiates the analysis and generation process.
@@ -34,7 +34,7 @@ In this scenario, we will see how an unprotected LLM responds to a malicious pro
 
 ## 3. Scenario 2: Blocking Attacks (Inbound Protection)
 
-Now, let's see how Lakera Guard protects against this attack.
+Now, let's see how Lakera Demo protects against this attack.
 
 1.  **Enable Protection**: Toggle **Lakera Inbound Scan** to **ON**.
 2.  **Re-run Attack**: Keep the same prompt from Scenario 1.
@@ -42,8 +42,8 @@ Now, let's see how Lakera Guard protects against this attack.
 4.  **Observe**:
     *   The traffic flow visualization will show the request stopping at the "Lakera Inbound" step.
     *   A red shield icon will appear.
-    *   The result modal will state **"Lakera Guard Blocked"**.
-    *   **Result**: Lakera Guard successfully identified the jailbreak attempt and prevented it from reaching the LLM.
+    *   The result modal will state **"Lakera Demo Blocked"**.
+    *   **Result**: Lakera Demo successfully identified the jailbreak attempt and prevented it from reaching the LLM.
 
 ## 4. Scenario 3: Preventing Leakage (Outbound Protection)
 
@@ -61,4 +61,4 @@ Sometimes, the risk isn't just what goes in, but what comes out (e.g., PII leaka
     *   The request goes to the LLM, and the LLM generates a response.
     *   However, the response is caught at the "Lakera Outbound" step.
     *   The result modal shows a block.
-    *   **Result**: Lakera Guard inspected the LLM's response and blocked it before it reached the user, preventing data leakage.
+    *   **Result**: Lakera Demo inspected the LLM's response and blocked it before it reached the user, preventing data leakage.

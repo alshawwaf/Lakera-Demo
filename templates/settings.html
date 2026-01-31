@@ -2,315 +2,172 @@
 
 <div class="dashboard-wrapper">
   {% if success %}
-  <div
-    class="alert success"
-    style="
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #4ade80;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    "
-  >
+  <div class="alert success" style="margin-bottom: 2rem; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; padding: 1rem; border-radius: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
     <span style="font-size: 1.2rem">✓</span> Settings saved successfully
   </div>
   {% endif %}
 
   <form method="POST" action="{{ url_for('settings') }}" class="settings-form">
-    <div class="settings-grid">
-      <!-- Column 1: Lakera -->
-      <div class="widget-card">
-        <div class="widget-header">
-          <h3>Lakera Configuration</h3>
-        </div>
+    <div class="settings-container">
+      
+      <!-- Section: Platform -->
+      <div class="settings-grid">
+        <div class="widget-card collapsed" id="card-lakera">
+          <div class="widget-header" onclick="toggleCard('card-lakera')">
+            <div class="header-main">
+              <img src="/static/lakera-logo.png" alt="Lakera">
+              <h3>Lakera Demo</h3>
+            </div>
+            <span class="toggle-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
+          </div>
 
-        <div class="input-wrapper" style="margin-bottom: 1.5rem">
-          <label
-            for="api_key"
-            style="
-              display: block;
-              margin-bottom: 0.5rem;
-              color: var(--text-secondary);
-              font-size: 0.9rem;
-            "
-            >Lakera API Key</label
-          >
-          <input
-            type="password"
-            id="api_key"
-            name="api_key"
-            value="{{ api_key }}"
-            class="search-input"
-            style="width: 100%; padding: 0.75rem"
-            placeholder="Enter your API Key"
-          />
-          <p
-            style="
-              margin-top: 0.5rem;
-              font-size: 0.8rem;
-              color: var(--text-secondary);
-            "
-          >
-            Your API key is stored securely in the local database.
-          </p>
-        </div>
+          <div class="widget-content">
+            <div class="input-group">
+              <label for="api_key" class="input-label">Lakera API Key</label>
+              <input type="password" id="api_key" name="api_key" value="{{ api_key }}" class="input-field" placeholder="Enter your API Key">
+              <p class="input-help">Stored securely in the local database.</p>
+            </div>
 
-        <div class="input-wrapper">
-          <label
-            for="project_id"
-            style="
-              display: block;
-              margin-bottom: 0.5rem;
-              color: var(--text-secondary);
-              font-size: 0.9rem;
-            "
-            >Project ID</label
-          >
-          <input
-            type="text"
-            id="project_id"
-            name="project_id"
-            value="{{ project_id }}"
-            class="search-input"
-            style="width: 100%; padding: 0.75rem"
-            placeholder="Enter your Project ID"
-          />
-        </div>
-      </div>
-
-      <!-- Column 2: Gemini & OpenAI Stacked -->
-      <div style="display: flex; flex-direction: column; gap: 2.5rem">
-        <!-- Google Gemini Card -->
-        <div class="widget-card stacked-card">
-          <div class="widget-header">
-            <div style="display: flex; align-items: center; gap: 0.75rem">
-              <img
-                src="/static/gemini-logo.png"
-                alt="Google Gemini"
-                style="width: 24px; height: 24px; object-fit: contain"
-              />
-              <h3>Google Gemini Configuration</h3>
+            <div class="input-group">
+              <label for="project_id" class="input-label">Project ID</label>
+              <input type="text" id="project_id" name="project_id" value="{{ project_id }}" class="input-field" placeholder="Enter your Project ID">
             </div>
           </div>
+        </div>
 
-          <div class="input-wrapper">
-            <label
-              for="gemini_api_key"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-secondary);
-                font-size: 0.9rem;
-              "
-              >Gemini API Key</label
-            >
-            <input
-              type="password"
-              id="gemini_api_key"
-              name="gemini_api_key"
-              value="{{ gemini_api_key }}"
-              class="search-input"
-              style="width: 100%; padding: 0.75rem"
-              placeholder="Enter your Google Gemini API Key"
-            />
+        <!-- OpenAI -->
+        <div class="widget-card collapsed" id="card-openai">
+          <div class="widget-header" onclick="toggleCard('card-openai')">
+            <div class="header-main">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="color: #10a37f;">
+                  <path d="M22.28 12.182c0-.527-.428-.954-.954-.954-.527 0-.954.427-.954.954V15.65c0 .527.427.954.954.954.526 0 .954-.427.954-.954v-3.468zM12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm0 14.4c-2.568 0-4.65-2.082-4.65-4.65S9.432 7.35 12 7.35s4.65 2.082 4.65 4.65-2.082 4.65-4.65 4.65z"></path>
+              </svg>
+              <h3>OpenAI</h3>
+            </div>
+            <span class="toggle-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
+          </div>
+          <div class="widget-content">
+            <div class="input-group">
+              <label for="openai_api_key" class="input-label">API Key</label>
+              <input type="password" id="openai_api_key" name="openai_api_key" value="{{ openai_api_key }}" class="input-field" placeholder="sk-...">
+            </div>
           </div>
         </div>
 
-        <!-- OpenAI Card -->
-        <div class="widget-card stacked-card">
-          <div class="widget-header">
-            <h3>OpenAI Configuration</h3>
+        <!-- Azure OpenAI -->
+        <div class="widget-card collapsed" id="card-azure-openai">
+          <div class="widget-header" onclick="toggleCard('card-azure-openai')">
+            <div class="header-main">
+              <img src="/static/azure-openai.png" alt="Azure OpenAI">
+              <h3>Azure OpenAI</h3>
+            </div>
+            <span class="toggle-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
           </div>
-
-          <div class="input-wrapper">
-            <label
-              for="openai_api_key"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-secondary);
-                font-size: 0.9rem;
-              "
-              >OpenAI API Key</label
-            >
-            <input
-              type="password"
-              id="openai_api_key"
-              name="openai_api_key"
-              value="{{ openai_api_key }}"
-              class="search-input"
-              style="width: 100%; padding: 0.75rem"
-              placeholder="Enter your OpenAI API Key"
-            />
+          <div class="widget-content">
+            <div class="input-group">
+              <label for="azure_openai_api_key" class="input-label">API Key</label>
+              <input type="password" id="azure_openai_api_key" name="azure_openai_api_key" value="{{ azure_openai_api_key }}" class="input-field">
+            </div>
+            <div class="input-group">
+              <label for="azure_openai_endpoint" class="input-label">Endpoint URL</label>
+              <input type="text" id="azure_openai_endpoint" name="azure_openai_endpoint" value="{{ azure_openai_endpoint }}" class="input-field" placeholder="https://...">
+            </div>
+            <div class="input-group">
+              <label for="azure_openai_deployment" class="input-label">Deployment Name</label>
+              <input type="text" id="azure_openai_deployment" name="azure_openai_deployment" value="{{ azure_openai_deployment }}" class="input-field">
+            </div>
           </div>
         </div>
 
-        <!-- Ollama Card -->
-        <div class="widget-card stacked-card">
-          <div class="widget-header">
-            <h3>Ollama Configuration</h3>
+        <!-- Google Gemini -->
+        <div class="widget-card collapsed" id="card-gemini">
+          <div class="widget-header" onclick="toggleCard('card-gemini')">
+            <div class="header-main">
+              <img src="/static/gemini-logo.png" alt="Gemini">
+              <h3>Google Gemini</h3>
+            </div>
+            <span class="toggle-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
           </div>
-
-          <div class="input-wrapper">
-            <label
-              for="ollama_api_url"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-secondary);
-                font-size: 0.9rem;
-              "
-              >Ollama API URL</label
-            >
-            <input
-              type="text"
-              id="ollama_api_url"
-              name="ollama_api_url"
-              value="{{ ollama_api_url }}"
-              class="search-input"
-              style="width: 100%; padding: 0.75rem"
-              placeholder="http://localhost:11434"
-            />
-            <p
-              style="
-                margin-top: 0.5rem;
-                font-size: 0.8rem;
-                color: var(--text-secondary);
-              "
-            >
-              The URL of your Ollama instance.
-            </p>
+          <div class="widget-content">
+            <div class="input-group">
+              <label for="gemini_api_key" class="input-label">API Key</label>
+              <input type="password" id="gemini_api_key" name="gemini_api_key" value="{{ gemini_api_key }}" class="input-field">
+            </div>
           </div>
+        </div>
 
-          <div class="input-wrapper">
-            <label
-              for="ollama_timeout"
-              style="
-                display: block;
-                margin-bottom: 0.5rem;
-                color: var(--text-secondary);
-                font-size: 0.9rem;
-              "
-              >Ollama Timeout (seconds)</label
-            >
-            <input
-              type="number"
-              id="ollama_timeout"
-              name="ollama_timeout"
-              value="{{ ollama_timeout }}"
-              class="search-input"
-              style="width: 100%; padding: 0.75rem"
-              placeholder="120"
-            />
+        <!-- Ollama -->
+        <div class="widget-card collapsed" id="card-ollama">
+          <div class="widget-header" onclick="toggleCard('card-ollama')">
+            <div class="header-main">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"></path>
+              </svg>
+              <h3>Ollama (Local)</h3>
+            </div>
+            <span class="toggle-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
+          </div>
+          <div class="widget-content">
+            <div class="input-group">
+              <label for="ollama_api_url" class="input-label">API URL</label>
+              <input type="text" id="ollama_api_url" name="ollama_api_url" value="{{ ollama_api_url }}" class="input-field" placeholder="http://localhost:11434">
+            </div>
+            <div class="input-group">
+              <label for="ollama_timeout" class="input-label">Timeout (seconds)</label>
+              <input type="number" id="ollama_timeout" name="ollama_timeout" value="{{ ollama_timeout }}" class="input-field">
+            </div>
+          </div>
+        </div>
+
+        <!-- Azure Content Safety -->
+        <div class="widget-card collapsed" id="card-azure-cs">
+          <div class="widget-header" onclick="toggleCard('card-azure-cs')">
+            <div class="header-main">
+              <img src="/static/azure-openai.png" alt="Azure">
+              <h3>Azure Content Safety</h3>
+            </div>
+            <span class="toggle-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
+          </div>
+          <div class="widget-content">
+            <div class="input-group">
+              <label for="azure_cs_endpoint" class="input-label">Endpoint URL</label>
+              <input type="text" id="azure_cs_endpoint" name="azure_cs_endpoint" value="{{ azure_cs_endpoint }}" class="input-field">
+            </div>
+            <div class="input-group">
+              <label for="azure_cs_key" class="input-label">API Key</label>
+              <input type="password" id="azure_cs_key" name="azure_cs_key" value="{{ azure_cs_key }}" class="input-field">
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Column 3: Azure OpenAI -->
-      <div class="widget-card">
-        <div class="widget-header">
-          <div style="display: flex; align-items: center; gap: 0.75rem">
-            <img
-              src="/static/azure-openai.png"
-              alt="Azure OpenAI"
-              style="width: 24px; height: 24px; object-fit: contain"
-            />
-            <h3>Azure OpenAI Configuration</h3>
-          </div>
-        </div>
-
-        <div class="input-wrapper" style="margin-bottom: 1.5rem">
-          <label
-            for="azure_openai_api_key"
-            style="
-              display: block;
-              margin-bottom: 0.5rem;
-              color: var(--text-secondary);
-              font-size: 0.9rem;
-            "
-            >Azure OpenAI API Key</label
-          >
-          <input
-            type="password"
-            id="azure_openai_api_key"
-            name="azure_openai_api_key"
-            value="{{ azure_openai_api_key }}"
-            class="search-input"
-            style="width: 100%; padding: 0.75rem"
-            placeholder="Enter your Azure OpenAI API Key"
-          />
-        </div>
-
-        <div class="input-wrapper" style="margin-bottom: 1.5rem">
-          <label
-            for="azure_openai_endpoint"
-            style="
-              display: block;
-              margin-bottom: 0.5rem;
-              color: var(--text-secondary);
-              font-size: 0.9rem;
-            "
-            >Azure OpenAI Endpoint</label
-          >
-          <input
-            type="text"
-            id="azure_openai_endpoint"
-            name="azure_openai_endpoint"
-            value="{{ azure_openai_endpoint }}"
-            class="search-input"
-            style="width: 100%; padding: 0.75rem"
-            placeholder="https://your-resource.openai.azure.com/"
-          />
-          <p
-            style="
-              margin-top: 0.5rem;
-              font-size: 0.8rem;
-              color: var(--text-secondary);
-            "
-          >
-            The endpoint URL for your Azure OpenAI resource.
-          </p>
-        </div>
-
-        <div class="input-wrapper">
-          <label
-            for="azure_openai_deployment"
-            style="
-              display: block;
-              margin-bottom: 0.5rem;
-              color: var(--text-secondary);
-              font-size: 0.9rem;
-            "
-            >Azure OpenAI Deployment Name</label
-          >
-          <input
-            type="text"
-            id="azure_openai_deployment"
-            name="azure_openai_deployment"
-            value="{{ azure_openai_deployment }}"
-            class="search-input"
-            style="width: 100%; padding: 0.75rem"
-            placeholder="e.g., gpt-4o-mini-2024-07-18"
-          />
-          <p
-            style="
-              margin-top: 0.5rem;
-              font-size: 0.8rem;
-              color: var(--text-secondary);
-            "
-          >
-            The name of your model deployment in Azure OpenAI Studio.
-          </p>
-        </div>
+      <div class="settings-actions">
+        <button type="submit" class="btn-gradient" style="padding: 1rem 2.5rem; font-size: 1rem;">Save All Changes</button>
       </div>
-    </div>
-
-    <div class="form-actions" style="display: flex; justify-content: flex-end">
-      <button type="submit" class="btn-gradient">Save Changes</button>
     </div>
   </form>
 </div>

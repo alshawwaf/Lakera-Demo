@@ -25,3 +25,6 @@ Thumbs.db
 # Local Development
 .gemini/
 tmp/
+models_cache/
+data/
+instance/

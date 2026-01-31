@@ -1,108 +1,201 @@
-/* Settings Grid */
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  margin-bottom: 2rem;
-  align-items: start;
+/* Settings Page Container */
+.dashboard-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
 }
 
-.settings-grid .widget-card {
-  height: auto;
-  min-height: 100%;
-  transition: all 0.3s ease;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-}
-
-.settings-grid .widget-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-  border-color: var(--accent-color);
-}
-
-.settings-grid .input-wrapper {
-  height: auto;
-}
-
-/* Compact Stacked Cards */
-.stacked-card {
-  padding: 2rem;
-}
-
-.stacked-card .widget-header {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.stacked-card .input-wrapper {
-  margin-bottom: 1.25rem;
-}
-
-.stacked-card h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-/* Threat List Widget */
-.threat-list {
+.settings-container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 3rem;
 }
 
-.threat-item {
+/* Section Styling */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-header {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.75rem;
-  background: var(--nav-link-hover);
-  border-radius: 0.75rem;
-  border: 1px solid transparent;
-  transition: all 0.2s;
-  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
 }
 
-.threat-item:hover {
-  background: var(--nav-link-hover);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(4px);
-}
-
-.threat-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.threat-name {
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-}
-
-.threat-count {
+.section-header h2 {
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.threat-progress {
-  height: 6px;
-  background: var(--border-color);
-  border-radius: 3px;
-  overflow: hidden;
+.section-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
 }
 
-.threat-bar {
+/* Settings Grid - Uniform size */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
+  align-items: stretch;
+  /* Make them same height in a row */
+}
+
+/* Widget Card Refinement */
+.widget-card {
   height: 100%;
-  border-radius: 3px;
-  transition: width 1s ease;
+  /* Uniform height */
+  background: var(--card-bg);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
-@media (max-width: 1024px) {
+.widget-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.75rem;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.widget-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.widget-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+}
+
+.widget-header img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Toggle Icon Animation */
+.toggle-icon {
+  color: var(--text-secondary);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.widget-card.expanded .toggle-icon {
+  transform: rotate(180deg);
+  color: var(--accent-color);
+}
+
+/* Collapsible Content */
+.widget-content {
+  padding: 0 1.75rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 1000px;
+  opacity: 1;
+  transition: all 0.4s ease-in-out;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 0;
+  padding-top: 1.5rem;
+}
+
+.widget-card.collapsed .widget-content {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  pointer-events: none;
+  border-top-color: transparent;
+}
+
+/* Input Styling */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.input-label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.875rem 1.1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.85rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.input-help {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  line-height: 1.5;
+  font-family: var(--font-body);
+}
+
+/* Actions */
+.settings-actions {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  display: flex;
+  justify-content: center;
+  /* Center save button */
+}
+
+@media (max-width: 768px) {
   .settings-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-wrapper {
+    padding: 1rem;
   }
 }

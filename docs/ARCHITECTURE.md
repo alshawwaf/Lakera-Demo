@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Lakera Guard Demo uses a **hybrid modular architecture** that combines modern ES6 modules with legacy monolithic code for backward compatibility and gradual migration.
+The Lakera Demo Demo uses a **hybrid modular architecture** that combines modern ES6 modules with legacy monolithic code for backward compatibility and gradual migration.
 
 ## File Organization
 
@@ -269,7 +269,7 @@ import('./pages/dashboard.js').then(module => {
 
 ### User Input
 - Sanitized before display
-- Lakera Guard scans all inputs
+- Lakera Demo scans all inputs
 - No direct eval() or innerHTML with user data
 
 ### CORS

@@ -9,23 +9,32 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Optimization: Install CPU-only torch first to save 800MB+ in core dependencies
+# This prevents downloading the massive CUDA version of torch
+# We do this BEFORE copying requirements.txt so that adding a small package doesn't trigger a torch redownload
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
 # Copy requirements first for better caching
 COPY requirements.txt /app/
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install remaining dependencies
+RUN pip install --no-cache-dir -r requirements.txt sentencepiece
 
-# Copy the current directory contents into the container at /app
+# Environment variables
+ENV APP_PORT=9000
+ENV HF_HOME=/app/models_cache
+
+# Copy the rest of the application
 COPY . /app
 
-# Make port 9000 available to the world outside this container
-EXPOSE 9000
+# Note: Models are NOT pre-downloaded during build.
+# The mounted models_cache volume will cache them at runtime.
+# This makes builds fast while models persist across container restarts.
 
-# Define environment variable
-ENV APP_PORT=9000
-
-# Make startup script executable
+# Ensure startup script is executable
 RUN chmod +x scripts/start_production.sh
+
+EXPOSE 9000
 
 # Run with environment-based configuration
 CMD ["./scripts/start_production.sh"]

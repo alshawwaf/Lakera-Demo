@@ -137,13 +137,13 @@ export function initPlayground() {
 
             if (!prompt) return;
 
-            // Get selected model info
-            const modelProvider = providerSelect ? providerSelect.value : 'openai';
-            const modelName = modelSelect ? modelSelect.value : '';
-
             setLoading(true, analyzeBtn);
 
             try {
+                // Standard scan logic
+                const modelProvider = providerSelect ? providerSelect.value : 'openai';
+                const modelName = modelSelect ? modelSelect.value : '';
+
                 const response = await fetch("/api/analyze", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -159,12 +159,10 @@ export function initPlayground() {
 
                 if (!response.ok) throw new Error(data.error || "Analysis failed");
 
-                // Pass model provider and name to displayResults for icon selection and labels
                 data.model_provider = modelProvider;
                 data.model_name = modelName;
                 displayResults(data);
 
-                // Check for configuration warnings in the response
                 if (data.openai_response && (
                     data.openai_response.includes("not configured") ||
                     data.openai_response.includes("API Key not configured")

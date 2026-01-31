@@ -34,6 +34,37 @@
   z-index: 101;
 }
 
+.brand-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brand-text {
+  font-family: var(--font-family-heading);
+  font-size: 1.6rem;
+  font-weight: 900;
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.4));
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.brand-link:hover .brand-text {
+  background: var(--brand-gradient-hover);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.6));
+  transform: translateY(-2px) scale(1.05);
+  letter-spacing: -0.04em;
+}
+
 .partner-logo {
   height: 28px;
   width: auto;
@@ -218,12 +249,8 @@
 }
 
 .header-content h2 {
-  font-size: 2rem;
+  font-size: 2.25rem;
   margin: 0 0 0.5rem 0;
-  background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .header-content p {
@@ -250,7 +277,8 @@
   }
 
   .mobile-menu-toggle {
-    display: flex; /* Show hamburger menu on mobile */
+    display: flex;
+    /* Show hamburger menu on mobile */
   }
 
   .main-nav {
@@ -264,7 +292,8 @@
   }
 
   .main-nav.active {
-    display: flex; /* Show when active */
+    display: flex;
+    /* Show when active */
   }
 
   .main-nav a {

@@ -46,6 +46,16 @@ document.addEventListener("DOMContentLoaded", () => {
     import('./pages/logs.js').then(module => {
       module.initLogs();
     });
+  } else if (document.querySelector(".benchmark-page")) {
+    console.log("Initializing Benchmarking...");
+    import('./pages/benchmarking.js?v=3').then(module => {
+      module.initBenchmarking();
+    });
+  } else if (document.querySelector(".settings-form")) {
+    console.log("Initializing Settings...");
+    import('./pages/settings.js').then(module => {
+      module.initSettings();
+    });
   } else {
     console.log("No specific page detected.");
   }

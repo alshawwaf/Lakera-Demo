@@ -4,7 +4,7 @@ The Settings page allows you to configure the application's connections to exter
 
 ## 1. Lakera Configuration
 
-This is the most critical section. You must provide valid credentials to use Lakera Guard.
+This is the most critical section. You must provide valid credentials to use Lakera Demo.
 
 *   **Lakera API Key**: Your secret key from the Lakera Platform.
 *   **Project ID**: The specific project identifier associated with your key.

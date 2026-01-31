@@ -18,135 +18,248 @@ export function displayResults(data) {
   flagsContainer.innerHTML = "";
   if (statsContainer) statsContainer.innerHTML = "";
 
-  const lakeraResult = data.lakera_result;
-  const lakeraOutboundResult = data.lakera_outbound_result;
-  const isFlagged = data.flagged;
-  const isOutboundFlagged =
-    lakeraOutboundResult && lakeraOutboundResult.flagged;
+  if (data.isComparison) {
+    // --- Comparison View Logic ---
+    modalHeader.className = `modal-header compact-header neutral`;
+    modalHeader.innerHTML = `
+      <div class="compact-header-left">
+        <span class="compact-status-badge" style="--status-color: var(--primary-color)">
+          <span class="status-icon">📊</span>
+          <span class="status-text">Market Comparison</span>
+        </span>
+        <span class="compact-model-badge">Lakera vs Competitors</span>
+      </div>
+      <button class="close-modal-btn" id="close-result-modal">&times;</button>
+    `;
 
-  // --- Compact Header Logic ---
-  let headerClass, statusIcon, statusText, statusColor;
+    const comparisonContainer = document.createElement("div");
+    comparisonContainer.className = "comparison-view";
 
-  if (!lakeraResult) {
-    headerClass = "neutral";
-    statusIcon = "○";
-    statusText = "Not Scanned";
-    statusColor = "var(--text-secondary)";
-  } else if (isFlagged) {
-    headerClass = "danger";
-    statusIcon = "⛔";
-    statusText = "Threat Blocked";
-    statusColor = "#ef4444";
-  } else if (isOutboundFlagged) {
-    headerClass = "warning";
-    statusIcon = "⚠️";
-    statusText = "Outbound Threat";
-    statusColor = "#f97316";
-  } else {
-    headerClass = "success";
-    statusIcon = "✓";
-    statusText = "Safe";
-    statusColor = "#22c55e";
-  }
+    // Chart Section
+    const chartCard = document.createElement("div");
+    chartCard.className = "modal-card comparison-chart-card";
+    chartCard.innerHTML = `<canvas id="comparison-chart" height="150"></canvas>`;
+    comparisonContainer.appendChild(chartCard);
 
-  // Provider label
-  let providerLabel = "OpenAI";
-  if (data.model_provider === "azure") providerLabel = "Azure";
-  else if (data.model_provider === "gemini") providerLabel = "Gemini";
-  else if (data.model_provider === "ollama") providerLabel = "Ollama";
+    // Vendor Details Section
+    const vendorGrid = document.createElement("div");
+    vendorGrid.className = "vendor-comparison-grid";
 
-  const modelDisplay = data.model_name ? `${providerLabel} · ${data.model_name}` : providerLabel;
+    data.results.forEach(res => {
+      const vendorCard = document.createElement("div");
+      const isError = !!res.error;
+      const vendorClass = isError ? 'error' : (res.flagged ? 'flagged' : 'safe');
+      vendorCard.className = `vendor-card ${vendorClass}`;
 
-  modalHeader.className = `modal-header compact-header ${headerClass}`;
-  modalHeader.innerHTML = `
-    <div class="compact-header-left">
-      <span class="compact-status-badge" style="--status-color: ${statusColor}">
-        <span class="status-icon">${statusIcon}</span>
-        <span class="status-text">${statusText}</span>
-      </span>
-      <span class="compact-model-badge">${modelDisplay}</span>
-    </div>
-    <button class="close-modal-btn" id="close-result-modal">&times;</button>
-  `;
+      const statusColor = isError ? "#f97316" : (res.flagged ? "#ef4444" : "#22c55e");
+      const statusIcon = isError ? "⚠️" : (res.flagged ? "⛔" : "✓");
 
-  // --- Traffic Flow Section ---
-  const flowCard = document.createElement("div");
-  flowCard.className = "modal-card compact-flow-card";
+      vendorCard.innerHTML = `
+        <div class="vendor-info">
+          <div class="vendor-header">
+            <span class="vendor-name">${res.vendor}</span>
+            <span class="vendor-status" style="color: ${statusColor}">${statusIcon}</span>
+          </div>
+          <div class="vendor-score-bar">
+            <div class="score-fill" style="width: ${res.score}%; background: ${statusColor}"></div>
+          </div>
+          <div class="vendor-score-text">${isError ? 'Service Error' : `${res.score}% Threat Confidence`}</div>
+          <div class="vendor-details">
+            ${res.details && res.details.length > 0
+          ? res.details.map(d => `<span class="detail-pill">${d}</span>`).join('')
+          : '<span class="detail-pill">No threats detected</span>'}
+          </div>
+        </div>
+      `;
+      vendorGrid.appendChild(vendorCard);
+    });
 
-  const useLakera = document.getElementById("lakera-scan-checkbox").checked;
-  const useLakeraOutbound = document.getElementById(
-    "lakera-outbound-checkbox"
-  ).checked;
+    comparisonContainer.appendChild(vendorGrid);
+    flagsContainer.appendChild(comparisonContainer);
 
-  const flowDiagram = renderTrafficFlow(data, useLakera, useLakeraOutbound);
-  flowCard.appendChild(flowDiagram);
-  flagsContainer.appendChild(flowCard);
+    // Initialize Chart (wait for DOM)
+    setTimeout(() => {
+      const chartCanvas = document.getElementById('comparison-chart');
+      if (!chartCanvas) return;
 
-  // --- Threats Section (Compact Pills) ---
-  const inboundVectors =
-    lakeraResult && lakeraResult.attack_vectors
-      ? lakeraResult.attack_vectors
-      : [];
-  const outboundVectors = [];
-
-  if (lakeraOutboundResult && lakeraOutboundResult.breakdown) {
-    lakeraOutboundResult.breakdown.forEach((r) => {
-      if (r.detected && r.detector_type) {
-        const vectorName = r.detector_type.split("/").pop();
-        if (!outboundVectors.includes(vectorName)) {
-          outboundVectors.push(vectorName);
+      const ctx = chartCanvas.getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.results.map(r => r.vendor),
+          datasets: [{
+            label: 'Threat Confidence Score',
+            data: data.results.map(r => r.score || 0),
+            backgroundColor: data.results.map(r => r.flagged ? 'rgba(239, 68, 68, 0.7)' : 'rgba(34, 197, 94, 0.7)'),
+            borderColor: data.results.map(r => r.flagged ? '#ef4444' : '#22c55e'),
+            borderWidth: 2,
+            borderRadius: 6,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1500,
+            easing: 'easeOutQuart'
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.5)',
+                callback: function (value) { return value + '%'; }
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: 'rgba(255, 255, 255, 0.8)' }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              titleColor: '#fff',
+              bodyColor: '#cbd5e1',
+              padding: 12,
+              cornerRadius: 8,
+              displayColors: false
+            }
+          }
         }
-      }
-    });
-  }
+      });
+    }, 50);
 
-  if (inboundVectors.length > 0 || outboundVectors.length > 0) {
-    const threatSection = document.createElement("div");
-    threatSection.className = "compact-threat-section";
+  } else {
+    // --- Standard View Logic (Existing) ---
+    const lakeraResult = data.lakera_result;
+    const lakeraOutboundResult = data.lakera_outbound_result;
+    const isFlagged = data.flagged;
+    const isOutboundFlagged =
+      lakeraOutboundResult && lakeraOutboundResult.flagged;
 
-    const threatLabel = document.createElement("span");
-    threatLabel.className = "threat-section-label";
-    threatLabel.textContent = "Detected:";
-    threatSection.appendChild(threatLabel);
+    let headerClass, statusIcon, statusText, statusColor;
 
-    const pillContainer = document.createElement("div");
-    pillContainer.className = "threat-pills";
+    if (!lakeraResult) {
+      headerClass = "neutral";
+      statusIcon = "○";
+      statusText = "Not Scanned";
+      statusColor = "var(--text-secondary)";
+    } else if (isFlagged) {
+      headerClass = "danger";
+      statusIcon = "⛔";
+      statusText = "Threat Blocked";
+      statusColor = "#ef4444";
+    } else if (isOutboundFlagged) {
+      headerClass = "warning";
+      statusIcon = "⚠️";
+      statusText = "Outbound Threat";
+      statusColor = "#f97316";
+    } else {
+      headerClass = "success";
+      statusIcon = "✓";
+      statusText = "Safe";
+      statusColor = "#22c55e";
+    }
 
-    [...inboundVectors, ...outboundVectors].forEach((vector) => {
-      const pill = document.createElement("span");
-      pill.className = "threat-pill";
-      const color = getAttackColor(vector);
-      pill.style.setProperty("--pill-color", color);
-      pill.textContent = vector.replace(/_/g, " ");
-      pillContainer.appendChild(pill);
-    });
+    let providerLabel = "OpenAI";
+    if (data.model_provider === "azure") providerLabel = "Azure";
+    else if (data.model_provider === "gemini") providerLabel = "Gemini";
+    else if (data.model_provider === "ollama") providerLabel = "Ollama";
 
-    threatSection.appendChild(pillContainer);
-    flagsContainer.appendChild(threatSection);
-  }
+    const modelDisplay = data.model_name ? `${providerLabel} · ${data.model_name}` : providerLabel;
 
-  // Add Details Pane Container
-  const detailsPane = document.createElement("div");
-  detailsPane.id = "flow-details-pane";
-  detailsPane.className = "hidden";
-  flagsContainer.appendChild(detailsPane);
+    modalHeader.className = `modal-header compact-header ${headerClass}`;
+    modalHeader.innerHTML = `
+      <div class="compact-header-left">
+        <span class="compact-status-badge" style="--status-color: ${statusColor}">
+          <span class="status-icon">${statusIcon}</span>
+          <span class="status-text">${statusText}</span>
+        </span>
+        <span class="compact-model-badge">${modelDisplay}</span>
+      </div>
+      <button class="close-modal-btn" id="close-result-modal">&times;</button>
+    `;
 
-  // --- LLM Response Section ---
-  if (data.openai_response) {
-    const responseSection = document.createElement("div");
-    responseSection.className = "compact-response-section";
+    const flowCard = document.createElement("div");
+    flowCard.className = "modal-card compact-flow-card";
 
-    const responseHeader = document.createElement("div");
-    responseHeader.className = "response-header";
-    responseHeader.innerHTML = `<span class="response-label">${providerLabel} Response</span>`;
-    responseSection.appendChild(responseHeader);
+    const useLakera = document.getElementById("lakera-scan-checkbox").checked;
+    const useLakeraOutbound = document.getElementById(
+      "lakera-outbound-checkbox"
+    ).checked;
 
-    const responseBox = document.createElement("div");
-    responseBox.className = "compact-response-box";
-    responseBox.textContent = data.openai_response;
-    responseSection.appendChild(responseBox);
+    const flowDiagram = renderTrafficFlow(data, useLakera, useLakeraOutbound);
+    flowCard.appendChild(flowDiagram);
+    flagsContainer.appendChild(flowCard);
 
-    flagsContainer.appendChild(responseSection);
+    const inboundVectors =
+      lakeraResult && lakeraResult.attack_vectors
+        ? lakeraResult.attack_vectors
+        : [];
+    const outboundVectors = [];
+
+    if (lakeraOutboundResult && lakeraOutboundResult.breakdown) {
+      lakeraOutboundResult.breakdown.forEach((r) => {
+        if (r.detected && r.detector_type) {
+          const vectorName = r.detector_type.split("/").pop();
+          if (!outboundVectors.includes(vectorName)) {
+            outboundVectors.push(vectorName);
+          }
+        }
+      });
+    }
+
+    if (inboundVectors.length > 0 || outboundVectors.length > 0) {
+      const threatSection = document.createElement("div");
+      threatSection.className = "compact-threat-section";
+
+      const threatLabel = document.createElement("span");
+      threatLabel.className = "threat-section-label";
+      threatLabel.textContent = "Detected:";
+      threatSection.appendChild(threatLabel);
+
+      const pillContainer = document.createElement("div");
+      pillContainer.className = "threat-pills";
+
+      [...inboundVectors, ...outboundVectors].forEach((vector) => {
+        const pill = document.createElement("span");
+        pill.className = "threat-pill";
+        const color = getAttackColor(vector);
+        pill.style.setProperty("--pill-color", color);
+        pill.textContent = vector.replace(/_/g, " ");
+        pillContainer.appendChild(pill);
+      });
+
+      threatSection.appendChild(pillContainer);
+      flagsContainer.appendChild(threatSection);
+    }
+
+    const detailsPane = document.createElement("div");
+    detailsPane.id = "flow-details-pane";
+    detailsPane.className = "hidden";
+    flagsContainer.appendChild(detailsPane);
+
+    if (data.openai_response) {
+      const responseSection = document.createElement("div");
+      responseSection.className = "compact-response-section";
+
+      const responseHeader = document.createElement("div");
+      responseHeader.className = "response-header";
+      responseHeader.innerHTML = `<span class="response-label">${providerLabel} Response</span>`;
+      responseSection.appendChild(responseHeader);
+
+      const responseBox = document.createElement("div");
+      responseBox.className = "compact-response-box";
+      responseBox.textContent = data.openai_response;
+      responseSection.appendChild(responseBox);
+
+      flagsContainer.appendChild(responseSection);
+    }
   }
 
   // Re-attach close handler
@@ -225,7 +338,7 @@ function renderTrafficFlow(data, useLakera, useLakeraOutbound) {
   }
 
   const userIcon = "👤";
-  const lakeraIcon = `<img src="/static/lakera-logo.png" alt="Lakera" style="width: 28px; height: 28px; object-fit: contain;">`;
+  const lakeraIcon = `<svg viewBox="0 0 24 24" width="28" height="28" fill="#3B82F6"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 8.94-7 10.06-3.87-1.12-7-5.39-7-10.06v-4.7l7-3.12z"/></svg>`;
   const openaiIcon = `<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
         <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08-4.778 2.758a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/>
     </svg>`;
@@ -272,7 +385,7 @@ function renderTrafficFlow(data, useLakera, useLakeraOutbound) {
       : "active";
   html += createArrow(arrow1Status);
 
-  html += createStep("inbound", lakeraIcon, "Lakera Inbound", inboundStatus);
+  html += createStep("inbound", lakeraIcon, "Demo Inbound", inboundStatus);
 
   // Arrow 2: Inbound -> LLM
   let arrow2Status = "";
@@ -299,7 +412,7 @@ function renderTrafficFlow(data, useLakera, useLakeraOutbound) {
     html += createStep(
       "outbound",
       lakeraIcon,
-      "Lakera Outbound",
+      "Demo Outbound",
       outboundStatus
     );
 
@@ -403,7 +516,7 @@ function showStepDetails(stepId, data) {
       content = data.prompt || "No prompt data available.";
       break;
     case "inbound":
-      title = "Lakera Inbound Scan";
+      title = "Demo Inbound Scan";
       content = data.lakera_result
         ? JSON.stringify(data.lakera_result, null, 2)
         : "No scan performed.";
@@ -421,7 +534,7 @@ function showStepDetails(stepId, data) {
       content = data.openai_response || "No response generated.";
       break;
     case "outbound":
-      title = "Lakera Outbound Scan";
+      title = "Demo Outbound Scan";
       content = data.lakera_outbound_result
         ? JSON.stringify(data.lakera_outbound_result, null, 2)
         : "No scan performed.";

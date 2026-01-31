@@ -1,0 +1,77 @@
+/* Breakdown Table for Modal */
+.breakdown-table {
+    width: 100%;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    border-collapse: separate;
+    border-spacing: 0 0.25rem;
+}
+
+.breakdown-header {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+    padding: 0.5rem 1rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+.breakdown-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.5rem;
+    align-items: center;
+    border: 1px solid transparent;
+}
+
+.breakdown-row.good {
+    border-left: 3px solid #22c55e;
+}
+
+.breakdown-row.bad {
+    border-left: 3px solid #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.bd-type {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.bd-model {
+    color: var(--text-secondary);
+    font-family: monospace;
+    font-size: 0.8rem;
+}
+
+.bd-score {
+    font-weight: 600;
+}
+
+.breakdown-row.bad .bd-score {
+    color: #ef4444;
+}
+
+.breakdown-row.good .bd-score {
+    color: #22c55e;
+}
+
+.bd-status {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.breakdown-row.bad .bd-status {
+    color: #ef4444;
+}
+
+.breakdown-row.good .bd-status {
+    color: #22c55e;
+}

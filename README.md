@@ -1,21 +1,22 @@
 # Lakera Demo
 
-![Lakera Demo](https://img.shields.io/badge/Security-Lakera%20Guard-blueviolet?style=for-the-badge)
+![Lakera Demo](https://img.shields.io/badge/Security-Lakera%20Demo-blueviolet?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Backend-Flask-green?style=for-the-badge)
 ![JavaScript](https://img.shields.io/badge/Frontend-ES6%20Modules-yellow?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)
 
-A comprehensive demonstration platform for **Lakera Guard**, showcasing advanced AI security capabilities through real-time prompt analysis, comprehensive threat detection, and interactive visualization tools.
+A comprehensive demonstration platform for **Lakera Demo**, showcasing advanced AI security capabilities through real-time prompt analysis, comprehensive threat detection, and interactive visualization tools.
 
 ---
 
 ## Overview
 
-Lakera Demo is a full-featured web application designed to demonstrate the power of Lakera Guard's AI security platform. The application provides security professionals and AI developers with a hands-on environment to test, analyze, and understand LLM security vulnerabilities through an intuitive interface.
+Lakera Demo is a full-featured web application designed to demonstrate the power of the Lakera Demo security platform. The application provides security professionals and AI developers with a hands-on environment to test, analyze, and understand LLM security vulnerabilities through an intuitive interface.
 
 ### Key Capabilities
 
 **Security Playground**
+
 - Split-screen interface enabling efficient prompt testing and analysis
 - Support for multiple LLM providers: OpenAI, Azure OpenAI, and Google Gemini
 - Real-time traffic flow visualization showing request/response pipelines
@@ -23,16 +24,25 @@ Lakera Demo is a full-featured web application designed to demonstrate the power
 - Batch scanning capabilities for automated security testing
 
 **Analytics Dashboard**
+
 - Real-time metrics tracking total scans, threats blocked, and success rates
 - Interactive visualization charts for threat distribution and scan activity
 - Time-based filtering (1 hour, 24 hours, 7 days)
 - Professional PDF report generation for compliance and documentation
 
 **Log Management**
+
 - Complete audit trail of all security scans with full JSON payloads
 - Advanced filtering by date range, attack vector, and detection status
 - Export functionality supporting both JSON and CSV formats
 - Pagination support for handling large datasets efficiently
+
+**Market Analysis & Benchmarking**
+
+- Side-by-side comparison with **Azure AI Content Safety** (Cloud baseline)
+- Performance benchmarking against **LLM Guard** (Open-source toolkit)
+- Comparative visualization charts showing threat confidence across vendors
+- Unified configuration for multi-vendor security evaluation
 
 ---
 
@@ -41,19 +51,22 @@ Lakera Demo is a full-featured web application designed to demonstrate the power
 ### Technology Stack
 
 **Backend Infrastructure**
+
 - **Flask**: Lightweight Python web framework for API and routing
 - **SQLAlchemy**: Database ORM for SQLite-based persistent storage
 - **SQLite**: Embedded database for logs and application settings
 - **Flasgger**: Automated API documentation generation
 
 **Frontend Technologies**
+
 - **Vanilla JavaScript**: ES6 modules for modular, maintainable code
 - **CSS3**: Modern styling with glassmorphism effects and dark mode support
 - **Chart.js**: Interactive data visualizations for analytics
 - **No Framework Dependencies**: Pure web technologies for maximum flexibility
 
 **AI Integration**
-- **Lakera Guard**: Primary security scanning engine
+
+- **Lakera Demo**: Primary security scanning engine
 - **OpenAI**: GPT model integration for response generation
 - **Azure OpenAI**: Enterprise OpenAI deployment support
 - **Google Gemini**: Google's generative AI model support
@@ -76,7 +89,7 @@ Lakera Demo is a full-featured web application designed to demonstrate the power
 Before installation, ensure you have the following:
 
 - **Python 3.11 or higher**: Required for application runtime
-- **Lakera Guard API Key**: Obtain from [Lakera Platform](https://platform.lakera.ai)
+- **Demo API Key**: Obtain from the platform
 - **Optional LLM API Keys**: For OpenAI, Azure OpenAI, or Google Gemini integration
 - **Ollama** (optional): For local LLM testing (requires running instance)
 - **Docker** (optional): For containerized deployment
@@ -91,17 +104,20 @@ This project uses GitHub Actions for Continuous Integration and Deployment.
 - **Deploy**: Deploys to the production environment (requires configuration).
 
 ### Triggering a Deployment
+
 Deployments are triggered automatically on pushes to the `main` branch after successful tests and security checks.
 
 #### Standard Installation
 
 1. **Clone the Repository**
+
    ```bash
    git clone Lakera-demo
    cd Lakera-demo
    ```
 
 2. **Create Virtual Environment**
+
    ```bash
    python -m venv venv
    
@@ -113,21 +129,24 @@ Deployments are triggered automatically on pushes to the `main` branch after suc
    ```
 
 3. **Install Dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Configure Environment Variables**
-   
+
    Copy the example environment file and configure your API keys:
+
    ```bash
    cp .env.example .env
    ```
-   
+
    Edit `.env` with your credentials:
+
    ```env
-   LAKERA_API_KEY=your_lakera_api_key
-   LAKERA_PROJECT_ID=your_project_id
+   DEMO_API_KEY=your_demo_api_key
+   DEMO_PROJECT_ID=your_project_id
    
    # Optional: Configure LLM providers
    OPENAI_API_KEY=your_openai_key
@@ -139,10 +158,11 @@ Deployments are triggered automatically on pushes to the `main` branch after suc
    ```
 
 5. **Initialize and Run**
+
    ```bash
    python app.py
    ```
-   
+
    Access the application at `http://127.0.0.1:9000`
 
 #### Docker Deployment
@@ -150,11 +170,13 @@ Deployments are triggered automatically on pushes to the `main` branch after suc
 For containerized deployment:
 
 1. **Build the Docker Image**
+
    ```bash
    docker build -t lakera-demo .
    ```
 
 2. **Run the Container**
+
    ```bash
    docker run -p 9000:9000 --env-file .env lakera-demo
    ```
@@ -175,9 +197,10 @@ docker compose -f docker-compose.production.yml ps
 ```
 
 **Services included:**
+
 - Main application with Gunicorn
 - Redis for distributed rate limiting
-- Redis Commander (web UI at http://localhost:8081)
+- Redis Commander (web UI at <http://localhost:8081>)
 - Nginx reverse proxy (production profile)
 - Automated backup service (production profile)
 
@@ -195,9 +218,9 @@ The application supports the following configuration options via `.env`:
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `LAKERA_API_KEY` | Lakera Guard API authentication key | Yes | - |
-| `LAKERA_PROJECT_ID` | Lakera project identifier | Yes | - |
-| `LAKERA_API_URL` | Lakera API endpoint | No | `https://api.lakera.ai/v2/guard` |
+| `DEMO_API_KEY` | Demo API authentication key | Yes | - |
+| `DEMO_PROJECT_ID` | Demo project identifier | Yes | - |
+| `DEMO_API_URL` | Demo API endpoint | No | `https://api.lakera.ai/v2/guard` |
 | `OPENAI_API_KEY` | OpenAI API key | No | - |
 | `AZURE_OPENAI_API_KEY` | Azure OpenAI API key | No | - |
 | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL | No | - |
@@ -212,6 +235,7 @@ The application supports the following configuration options via `.env`:
 ### Runtime Configuration
 
 Additional settings can be configured through the Settings page in the web interface:
+
 - API key management
 - Default LLM provider selection
 - Model preferences
@@ -224,7 +248,7 @@ Additional settings can be configured through the Settings page in the web inter
 
 1. **Navigate to Playground**: Access the main testing interface
 2. **Enter Prompt**: Input text you want to scan for threats
-3. **Configure Options**: 
+3. **Configure Options**:
    - Enable Lakera Inbound scan for prompt analysis
    - Enable Lakera Outbound scan for response checking
    - Select LLM provider and model
@@ -318,11 +342,13 @@ python -m pytest tests/
 This project includes VS Code settings to properly handle Jinja templates:
 
 **Included Configuration (`.vscode/settings.json`):**
+
 - Associates `.html` files with Jinja-HTML language mode
 - Disables auto-formatting for Jinja templates to prevent syntax corruption
 - Enables Emmet support in Jinja-HTML files
 
 **Recommended Extension:**
+
 - **[Jinja HTML](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml)**: Provides syntax highlighting for Jinja2 templates
 
 > **Note**: The VS Code HTML formatter may add spaces inside `{{ }}` Jinja brackets, breaking template syntax. The included settings prevent this by using Jinja-HTML mode.
@@ -337,7 +363,7 @@ Additional resources for developers and users:
 - **[Architecture Overview](docs/ARCHITECTURE.md)**: System design and technical details
 - **[Production Deployment](docs/PRODUCTION.md)**: Production deployment guide
 - **[Configuration Reference](docs/CONFIGURATION.md)**: Complete environment variable reference
-- **[Lakera Guard Documentation](https://platform.lakera.ai/docs)**: Official Lakera Guard API reference
+- **[Demo Documentation](https://platform.lakera.ai/docs)**: Official API reference
 
 ---
 
@@ -350,7 +376,7 @@ This project is licensed under the MIT License. See LICENSE file for details.
 ## Support
 
 For issues, questions, or contributions:
+
 - Open an issue on GitHub
 - Consult the documentation
 - Contact Lakera support for API-related questions
-

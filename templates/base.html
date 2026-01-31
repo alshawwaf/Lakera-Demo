@@ -8,34 +8,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,200;12..96,400;12..96,600;12..96,800&display=swap"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/main.css') }}?v=26"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/components/comparison.css') }}?v=1"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <div class="app-container">
       <header class="main-header">
         <div class="logo">
-          <a href="https://www.checkpoint.com" target="_blank" rel="noopener noreferrer">
-            <img
-              src="{{ url_for('static', filename='checkpoint_logo.png') }}"
-              alt="Check Point"
-              class="partner-logo"
-              style="background: #f5f5f5; padding: 0.5rem; border-radius: 0.5rem; width: 100px; height: auto; object-fit: contain;"
-            />
-          </a>
-          <div class="logo-divider"></div>
-          <a href="https://www.lakera.ai/" target="_blank" rel="noopener noreferrer">
-            <img
-              src="{{ url_for('static', filename='lakera_brand.png') }}"
-              alt="Lakera Demo"
-              class="lakera-logo"
-              style="width: 100px; height: auto; object-fit: contain;"
-            />
+          <a href="{{ url_for('playground') }}" class="brand-link">
+            <span class="brand-text">Lakera Demo</span>
           </a>
         </div>
 
@@ -67,7 +58,7 @@
             Playground
           </a>
           <div class="nav-item dropdown">
-            <a href="#" class="nav-link dropdown-toggle {{ 'active' if request.endpoint in ['dashboard', 'logs'] else '' }}">
+            <a href="#" class="nav-link dropdown-toggle {{ 'active' if request.endpoint in ['dashboard', 'logs', 'benchmarking'] else '' }}">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                 <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -79,6 +70,7 @@
               </svg>
             </a>
             <div class="dropdown-menu">
+              <div class="dropdown-header">Analytics</div>
               <a href="{{ url_for('dashboard') }}" class="dropdown-item {{ 'active' if request.endpoint == 'dashboard' else '' }}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="3" width="7" height="7"></rect>
@@ -97,6 +89,16 @@
                   <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
                 Logs
+              </a>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-header">Competitors</div>
+              <a href="{{ url_for('benchmarking') }}" class="dropdown-item {{ 'active' if request.endpoint == 'benchmarking' else '' }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="18" y="3" width="4" height="18" rx="1"></rect>
+                  <rect x="10" y="8" width="4" height="13" rx="1"></rect>
+                  <rect x="2" y="13" width="4" height="8" rx="1"></rect>
+                </svg>
+                Benchmarking
               </a>
             </div>
           </div>
@@ -154,7 +156,7 @@
     </div>
     
     <!-- New modular system (loaded as ES6 modules) -->
-    <script type="module" src="{{ url_for('static', filename='js/main.js') }}?v=1"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}?v=2"></script>
 
     <script>
       // Theme Toggle Logic

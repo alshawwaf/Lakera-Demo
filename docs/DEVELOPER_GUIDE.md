@@ -38,7 +38,7 @@ Welcome to the Lakera Demo developer documentation. This guide is designed to he
 4.  **Configuration**
     Create a `.env` file in the root directory:
     ```env
-    # Lakera Guard
+    # Lakera Demo
     LAKERA_API_KEY=your_key
     LAKERA_PROJECT_ID=your_id
 
@@ -78,7 +78,7 @@ The application follows a **modular hybrid architecture**, combining a Flask bac
 - **Framework**: Flask
 - **Database**: SQLite (via SQLAlchemy)
 - **API Routes**:
-    - `/api/analyze`: Core logic for Lakera Guard scans.
+    - `/api/analyze`: Core logic for Lakera Demo scans.
     - `/api/analytics`: Dashboard metrics.
     - `/api/logs`: Log management.
 
@@ -93,7 +93,7 @@ The application follows a **modular hybrid architecture**, combining a Flask bac
 ### Data Flow
 1.  **User Input** → `playground.js`
 2.  **API Call** → `POST /api/analyze`
-3.  **Backend** → Lakera Guard Inbound → LLM (OpenAI/Gemini) → Lakera Guard Outbound
+3.  **Backend** → Lakera Demo Inbound → LLM (OpenAI/Gemini) → Lakera Demo Outbound
 4.  **Response** → Frontend Visualization (Traffic Flow)
 
 ## Project Structure
@@ -201,6 +201,6 @@ If you encounter `Authentication failed` or `osxkeychain` errors on Linux:
 
 ## Resources
 
-- [Lakera Guard API Documentation](https://platform.lakera.ai/docs)
+- [Lakera Demo API Documentation](https://platform.lakera.ai/docs)
 - [Flask Documentation](https://flask.palletsprojects.com/)
 - [Chart.js Documentation](https://www.chartjs.org/)

@@ -2,9 +2,14 @@ Flask
 python-dotenv
 requests
 Flask-SQLAlchemy
-google-generativeai
+google-genai
 flasgger
 gunicorn
 Flask-Limiter
 Flask-CORS
 redis
+azure-ai-contentsafety
+azure-core
+llm-guard
+numpy<2
+sentencepiece

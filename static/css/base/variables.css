@@ -15,7 +15,9 @@
   --nav-link-bg: rgba(30, 41, 59, 0.6);
   --nav-link-hover: rgba(255, 255, 255, 0.1);
   --dropdown-bg: #1e293b;
-  --font-family: "Inter", system-ui, -apple-system, sans-serif;
+  --font-family-heading: "Unbounded", system-ui, sans-serif;
+  --font-family-body: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-family: var(--font-family-body);
 
   /* New diverse color palette */
   --purple-color: #a855f7;
@@ -26,6 +28,10 @@
   --orange-light: #fb923c;
   --amber-color: #f59e0b;
   --amber-light: #fbbf24;
+
+  /* Vibrant Brand Gradients */
+  --brand-gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
+  --brand-gradient-hover: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 50%, #f9a8d4 100%);
 }
 
 [data-theme="light"] {
@@ -44,4 +50,7 @@
   --nav-link-bg: rgba(241, 245, 249, 0.8);
   --nav-link-hover: rgba(0, 0, 0, 0.05);
   --dropdown-bg: #ffffff;
+
+  /* Light mode brand gradients - slightly more punchy */
+  --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #db2777 100%);
 }
