@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container">
+    <div class="glass-panel login-panel">
+        <h2 class="login-title">Lakera Demo</h2>
+        <p class="login-subtitle">Please sign in to continue</p>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-error">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="admin@example.com" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••" class="form-control">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 1rem;
+    }
+    
+    .login-panel {
+        width: 100%;
+        max-width: 400px;
+        padding: 2.5rem;
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        background: rgba(17, 25, 40, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+    
+    .login-title {
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-family: 'Unbounded', sans-serif;
+        font-size: 1.5rem;
+        background: linear-gradient(to right, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .login-subtitle {
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-family: inherit;
+        transition: all 0.2s;
+        /* Fix for box-sizing causing overflow */
+        box-sizing: border-box; 
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #60a5fa;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-block {
+        width: 100%;
+        margin-top: 1rem;
+        justify-content: center;
+        /* Fix for button sizing */
+        box-sizing: border-box;
+    }
+    
+    .alert-error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

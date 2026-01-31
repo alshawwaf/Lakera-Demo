@@ -29,6 +29,15 @@ from flask_limiter.util import get_remote_address
 from flask_cors import CORS
 import traceback
 import random
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    logout_user,
+    current_user,
+    fresh_login_required,
+)
 
 try:
     from transformers import set_seed
@@ -56,6 +65,30 @@ warnings.filterwarnings("ignore", category=FutureWarning, module="google.api_cor
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev_secret_key")
+
+# --- Flask-Login Configuration ---
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+login_manager.login_message_category = "error"
+
+
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+        self.email = os.getenv("DEFAULT_ADMIN_EMAIL")
+
+    def get_id(self):
+        return self.id
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id == "admin":
+        return User(id="admin")
+    return None
+
 
 # Configure CORS with environment variable
 cors_origins = os.getenv("CORS_ORIGINS", "*")
@@ -478,7 +511,42 @@ with app.app_context():
     # executor.submit(warm_up_llm_guard)
 
 
+# --- Auth Routes ---
+from flask import flash, redirect, url_for
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("playground"))
+
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        # Simple check against env vars
+        admin_email = os.getenv("DEFAULT_ADMIN_EMAIL")
+        admin_pass = os.getenv("DEFAULT_ADMIN_PASSWORD")
+
+        if email == admin_email and password == admin_pass:
+            user = User(id="admin")
+            login_user(user)
+            return redirect(url_for("playground"))
+        else:
+            flash("Invalid email or password", "error")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+
 @app.route("/")
+@login_required
 def index():
     openai_api_key = get_setting("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
     available_models = get_available_models(openai_api_key)
@@ -518,6 +586,7 @@ def index():
 
 
 @app.route("/playground")
+@login_required
 def playground():
     openai_api_key = get_setting("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
     available_models = get_available_models(openai_api_key)
@@ -557,16 +626,19 @@ def playground():
 
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
     return render_template("dashboard.html")
 
 
 @app.route("/logs")
+@login_required
 def logs():
     return render_template("logs.html")
 
 
 @app.route("/benchmarking")
+@login_required
 def benchmarking():
     """
     Render the competitor benchmarking dashboard.
@@ -710,7 +782,9 @@ def get_azure_content_safety_client():
         "AZURE_CONTENT_SAFETY_KEY"
     )
     if endpoint and key:
-        return ContentSafetyClient(endpoint, AzureKeyCredential(key))
+        return ContentSafetyClient(
+            endpoint.strip().rstrip("/"), AzureKeyCredential(key.strip())
+        )
     return None
 
 
@@ -730,8 +804,8 @@ def scan_with_azure(text, config=None):
     }
 
     if config:
-        endpoint = config.get("endpoint")
-        key = config.get("key")
+        endpoint = config.get("endpoint", "").strip().rstrip("/")
+        key = config.get("key", "").strip()
     else:
         # Fallback for direct calls (might fail in threads)
         client = get_azure_content_safety_client()
@@ -753,36 +827,97 @@ def scan_with_azure(text, config=None):
             )
             return res_obj
 
-        # If we have config, we create a fresh client to avoid any potential cross-thread issues with the global client
-        client = (
-            ContentSafetyClient(endpoint, AzureKeyCredential(key)) if config else client
-        )
+        # Debug logging for endpoint setup
+        if config:
+            is_hex = all(c in "0123456789abcdefABCDEF" for c in key)
+            masked_key = f"{key[:4]}...{key[-4:]}" if len(key) > 8 else "****"
+            logging.info(
+                f"Azure CS: Initializing with endpoint={endpoint}, key={masked_key}, length={len(key)}, is_hex={is_hex}"
+            )
+            client = ContentSafetyClient(endpoint, AzureKeyCredential(key))
+            if not is_hex:
+                logging.warning(
+                    "Azure CS: WARNING - Key is not a standard hex string. Ensure you copied a 'KEY' from the Azure Portal, not a Connection String or Project ID."
+                )
 
         from azure.ai.contentsafety.models import AnalyzeTextOptions
 
         options = AnalyzeTextOptions(text=text)
         response = client.analyze_text(options)
 
-        # Azure classifies into 4 categories with severity 0-7
+        # Azure classifies into categories with severity 0-7
+        # In v1.0.0+, these are in categories_analysis list
+        details = []
+        max_severity = 0
+
+        if hasattr(response, "categories_analysis"):
+            for cat in response.categories_analysis:
+                # category can be an enum or string, handle both
+                cat_name = getattr(
+                    cat,
+                    "category",
+                    str(cat.get("category") if isinstance(cat, dict) else ""),
+                )
+                severity = getattr(
+                    cat,
+                    "severity",
+                    cat.get("severity", 0) if isinstance(cat, dict) else 0,
+                )
+                details.append(f"{cat_name}: {severity}")
+                if severity > max_severity:
+                    max_severity = severity
+        else:
+            # Fallback for older SDK versions
+            severities = []
+            if hasattr(response, "hate_result") and response.hate_result:
+                severities.append(response.hate_result.severity)
+                details.append(f"Hate: {response.hate_result.severity}")
+            if hasattr(response, "self_harm_result") and response.self_harm_result:
+                severities.append(response.self_harm_result.severity)
+                details.append(f"Self-Harm: {response.self_harm_result.severity}")
+            if hasattr(response, "sexual_result") and response.sexual_result:
+                severities.append(response.sexual_result.severity)
+                details.append(f"Sexual: {response.sexual_result.severity}")
+            if hasattr(response, "violence_result") and response.violence_result:
+                severities.append(response.violence_result.severity)
+                details.append(f"Violence: {response.violence_result.severity}")
+            max_severity = max(severities) if severities else 0
+
         # Normalize score to 0-100 to match Lakera (Azure is 0-7, so * 14.28 roughly)
-        severities = [
-            response.hate_result.severity if response.hate_result else 0,
-            response.self_harm_result.severity if response.self_harm_result else 0,
-            response.sexual_result.severity if response.sexual_result else 0,
-            response.violence_result.severity if response.violence_result else 0,
-        ]
-        max_severity = max(severities)
         normalized_score = (max_severity / 7) * 100
 
-        details = []
-        if response.hate_result:
-            details.append(f"Hate: {response.hate_result.severity}")
-        if response.self_harm_result:
-            details.append(f"Self-Harm: {response.self_harm_result.severity}")
-        if response.sexual_result:
-            details.append(f"Sexual: {response.sexual_result.severity}")
-        if response.violence_result:
-            details.append(f"Violence: {response.violence_result.severity}")
+        # --- New: Add Prompt Shield (Jailbreak Detection) ---
+        # Note: Prompt Shield is a newer API not yet in the v1.0.0 SDK, so we use requests
+        try:
+            shield_url = (
+                f"{endpoint}/contentsafety/text:shieldPrompt?api-version=2024-09-01"
+            )
+            shield_headers = {
+                "Ocp-Apim-Subscription-Key": key,
+                "Content-Type": "application/json",
+            }
+            # The API supports 'userPrompt' and 'documents'
+            shield_body = {"userPrompt": text}
+
+            shield_response = requests.post(
+                shield_url, headers=shield_headers, json=shield_body, timeout=5
+            )
+            if shield_response.status_code == 200:
+                shield_data = shield_response.json()
+                user_result = shield_data.get("userPromptAnalysis", {})
+                if user_result.get("attackDetected"):
+                    details.append("⚠️ Prompt Injection/Jailbreak Detected")
+                    # Boost score if jailbreak is detected to ensure it's flagged prominently
+                    normalized_score = max(normalized_score, 100.0)
+                    max_severity = max(max_severity, 7)  # Mark as high severity
+                else:
+                    details.append("✓ No Jailbreak Detected")
+            else:
+                logging.warning(
+                    f"Azure Prompt Shield API returned {shield_response.status_code}: {shield_response.text}"
+                )
+        except Exception as shield_err:
+            logging.error(f"Azure Prompt Shield Error: {shield_err}")
 
         res_obj.update(
             {
