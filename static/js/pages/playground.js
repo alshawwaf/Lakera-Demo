@@ -24,30 +24,32 @@ export function initPlayground() {
 
         const provider = providerSelect.value;
         const data = window.llmData[provider];
-        const modelList = document.getElementById("model-datalist");
+        const modelSearch = document.getElementById("model-search");
         
-        if (modelList) modelList.innerHTML = "";
-        modelSelect.value = "";
+        // Reset search
+        if (modelSearch) modelSearch.value = "";
+        modelSelect.innerHTML = "";
 
         if (provider === 'azure') {
-            // Azure has fixed deployment
-            modelSelect.value = data.deployment;
+            const option = document.createElement("option");
+            option.value = data.deployment;
+            option.textContent = data.deployment;
+            modelSelect.appendChild(option);
             modelSelect.disabled = true;
+            if (modelSearch) modelSearch.disabled = true;
         } else {
             modelSelect.disabled = false;
+            if (modelSearch) modelSearch.disabled = false;
 
             if (Array.isArray(data) && data.length > 0) {
                 data.forEach(model => {
                     const option = document.createElement("option");
                     option.value = model;
-                    if (modelList) modelList.appendChild(option);
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
                 });
 
                 // Select logic: 
-                // 1. Force OpenAI to gpt-3.5-turbo
-                // 2. Force Gemini to gemini-flash-lite-latest
-                // 3. Fallback to saved model if it exists
-                // 4. Default to first item
                 const savedModel = localStorage.getItem("default_model");
 
                 if (provider === 'openai' && data.includes('gpt-3.5-turbo')) {
@@ -60,10 +62,37 @@ export function initPlayground() {
                     modelSelect.value = data[0];
                 }
             } else {
-                modelSelect.placeholder = provider === 'ollama' ? "No connection to server" : "No models available";
+                const option = document.createElement("option");
+                option.value = "";
+                option.textContent = provider === 'ollama' ? "No connection to server" : "No models available";
+                option.disabled = true;
+                option.selected = true;
+                modelSelect.appendChild(option);
                 modelSelect.disabled = true;
             }
         }
+    }
+
+    // Search filtering logic
+    const modelSearch = document.getElementById("model-search");
+    if (modelSearch && modelSelect) {
+        modelSearch.addEventListener("input", (e) => {
+            const term = e.target.value.toLowerCase();
+            const options = modelSelect.querySelectorAll("option");
+            let firstVisible = null;
+
+            options.forEach(opt => {
+                if (opt.disabled) return;
+                const matches = opt.value.toLowerCase().includes(term);
+                opt.style.display = matches ? "" : "none";
+                if (matches && !firstVisible) firstVisible = opt;
+            });
+
+            // Auto-select first match if current selection is hidden
+            if (firstVisible && modelSelect.selectedOptions[0]?.style.display === "none") {
+                modelSelect.value = firstVisible.value;
+            }
+        });
     }
 
     // Initial Load & Event Listeners

@@ -366,7 +366,9 @@ def load_recent_logs_from_db():
 
 def get_available_models(api_key):
     """Helper function to fetch available OpenAI models with caching"""
+    logging.info(f"Fetching OpenAI models. Key present: {bool(api_key)}")
     if not api_key:
+        logging.warning("No OpenAI API key found for model fetching")
         return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
 
     # Check cache
@@ -376,15 +378,16 @@ def get_available_models(api_key):
             return MODEL_CACHE["openai"]["data"]
 
     try:
+        logging.info("Requesting models from OpenAI API...")
         response = requests.get(
             "https://api.openai.com/v1/models",
             headers={"Authorization": f"Bearer {api_key}"},
-            timeout=2,  # Reduced timeout
+            timeout=5,
         )
         if response.status_code == 200:
             models = response.json().get("data", [])
-            # Include all models returned by the API (no filtering as requested)
             all_models = [m["id"] for m in models]
+            logging.info(f"OpenAI returned {len(all_models)} models")
             result = sorted(all_models, reverse=True)
 
             # Update cache
@@ -392,15 +395,19 @@ def get_available_models(api_key):
             MODEL_CACHE["openai"]["timestamp"] = now
             return result
 
+        logging.error(f"OpenAI API error: {response.status_code} - {response.text}")
         return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
-    except:
+    except Exception as e:
+        logging.error(f"Exception during OpenAI model fetch: {e}")
         return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
 
 
 def get_gemini_models():
     """Helper function to fetch available Gemini models with caching"""
     api_key = get_setting("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+    logging.info(f"Fetching Gemini models. Key present: {bool(api_key)}")
     if not api_key:
+        logging.warning("No Gemini API key found for model fetching")
         return []
 
     # Check cache
@@ -410,22 +417,10 @@ def get_gemini_models():
             return MODEL_CACHE["gemini"]["data"]
 
     try:
+        logging.info("Requesting models from Gemini API (GenAI SDK)...")
         client = genai.Client(api_key=api_key)
         models = list(client.models.list())
-
-        # Debug: check first model
-        if models:
-            m = models[0]
-            logging.info(f"[DEBUG] First Gemini model: {m.name}, Attributes: {dir(m)}")
-            # Log supported methods if they exist
-            supp_meth = (
-                getattr(m, "supported_methods", [])
-                or getattr(m, "supported_generation_methods", [])
-                or getattr(m, "supported_actions", [])
-            )
-            logging.info(
-                f"[DEBUG] Model {m.name} supported methods/actions: {supp_meth}"
-            )
+        logging.info(f"Gemini API returned {len(models)} models")
 
         gen_models = []
         for m in models:
@@ -434,6 +429,7 @@ def get_gemini_models():
             gen_models.append(name)
 
         result = sorted(list(set(gen_models)), reverse=True)
+        logging.info(f"Returning {len(result)} unsorted Gemini models: {result[:5]}...")
 
         # Update cache
         MODEL_CACHE["gemini"]["data"] = result
@@ -607,6 +603,19 @@ def playground():
         is_azure_openai_configured=is_azure_openai_configured,
         is_azure_content_safety_configured=is_azure_content_safety_configured,
     )
+
+
+@app.route("/debug_models")
+def debug_models_fetch():
+    openai_key = get_setting("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
+    o_models = get_available_models(openai_key)
+    g_models = get_gemini_models()
+    return {
+        "openai_count": len(o_models),
+        "gemini_count": len(g_models),
+        "openai_key_found": bool(openai_key),
+        "gemini_key_found": bool(os.getenv("GEMINI_API_KEY") or get_setting("GEMINI_API_KEY"))
+    }
 
 
 @app.route("/dashboard")
