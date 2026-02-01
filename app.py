@@ -383,15 +383,9 @@ def get_available_models(api_key):
         )
         if response.status_code == 200:
             models = response.json().get("data", [])
-            # Include all chat models (gpt, o1) and fine-tuned models
-            chat_models = [
-                m["id"]
-                for m in models
-                if "gpt" in m["id"]
-                or m["id"].startswith("o1")
-                or m["id"].startswith("ft:")
-            ]
-            result = sorted(chat_models, reverse=True)
+            # Include all models returned by the API (no filtering as requested)
+            all_models = [m["id"] for m in models]
+            result = sorted(all_models, reverse=True)
 
             # Update cache
             MODEL_CACHE["openai"]["data"] = result
