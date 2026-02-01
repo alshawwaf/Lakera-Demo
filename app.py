@@ -435,19 +435,9 @@ def get_gemini_models():
 
         gen_models = []
         for m in models:
-            # More permissive filtering for the playground
+            # User requested all models available via the license, no filtering
             name = m.name.replace("models/", "")
-            supp = (
-                getattr(m, "supported_methods", [])
-                or getattr(m, "supported_generation_methods", [])
-                or getattr(m, "supported_actions", [])
-            )
-
-            # If it supports contents or text generation
-            if any(act in supp for act in ["generateContent", "generateText", "chat"]):
-                gen_models.append(name)
-            elif "gemini" in name.lower():  # Fallback for gemini models
-                gen_models.append(name)
+            gen_models.append(name)
 
         result = sorted(list(set(gen_models)), reverse=True)
 

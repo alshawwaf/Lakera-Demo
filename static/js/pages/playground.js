@@ -24,14 +24,14 @@ export function initPlayground() {
 
         const provider = providerSelect.value;
         const data = window.llmData[provider];
-
-        modelSelect.innerHTML = "";
+        const modelList = document.getElementById("model-datalist");
+        
+        if (modelList) modelList.innerHTML = "";
+        modelSelect.value = "";
 
         if (provider === 'azure') {
-            const option = document.createElement("option");
-            option.value = data.deployment;
-            option.textContent = data.deployment;
-            modelSelect.appendChild(option);
+            // Azure has fixed deployment
+            modelSelect.value = data.deployment;
             modelSelect.disabled = true;
         } else {
             modelSelect.disabled = false;
@@ -40,8 +40,7 @@ export function initPlayground() {
                 data.forEach(model => {
                     const option = document.createElement("option");
                     option.value = model;
-                    option.textContent = model;
-                    modelSelect.appendChild(option);
+                    if (modelList) modelList.appendChild(option);
                 });
 
                 // Select logic: 
@@ -61,12 +60,7 @@ export function initPlayground() {
                     modelSelect.value = data[0];
                 }
             } else {
-                const option = document.createElement("option");
-                option.value = "";
-                option.textContent = provider === 'ollama' ? "No connection to server" : "No models available";
-                option.disabled = true;
-                option.selected = true; // Ensure this is the selected text
-                modelSelect.appendChild(option);
+                modelSelect.placeholder = provider === 'ollama' ? "No connection to server" : "No models available";
                 modelSelect.disabled = true;
             }
         }

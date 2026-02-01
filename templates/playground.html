@@ -38,9 +38,10 @@
                     <option value="ollama">Ollama (Local LLMs)</option>
                 </select>
 
-                <select id="model-select" class="styled-select">
+                <input list="model-datalist" id="model-select" class="styled-select" placeholder="Select or search model...">
+                <datalist id="model-datalist">
                     <!-- Populated by JS -->
-                </select>
+                </datalist>
             </div>
             <button id="set-default-btn" class="secondary-btn" style="padding: 0.75rem 1rem;"
                 title="Save as default preference">
