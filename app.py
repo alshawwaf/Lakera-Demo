@@ -377,7 +377,7 @@ def get_available_models(api_key):
     logging.info(f"Fetching OpenAI models. Key present: {bool(api_key)}")
     if not api_key:
         logging.warning("No OpenAI API key found for model fetching")
-        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+        return []
 
     # Check cache
     now = datetime.now()
@@ -404,10 +404,10 @@ def get_available_models(api_key):
             return result
 
         logging.error(f"OpenAI API error: {response.status_code} - {response.text}")
-        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+        return []
     except Exception as e:
         logging.error(f"Exception during OpenAI model fetch: {e}")
-        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+        return []
 
 
 def get_gemini_models():
@@ -445,12 +445,7 @@ def get_gemini_models():
         return result
     except Exception as e:
         logging.error(f"Error fetching Gemini models: {e}")
-        return [
-            "gemini-flash-lite-latest",
-            "gemini-1.5-flash",
-            "gemini-1.5-pro",
-            "gemini-pro",
-        ]
+        return []
 
 
 def get_ollama_models():
