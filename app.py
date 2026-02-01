@@ -1531,9 +1531,7 @@ def analyze():
     use_lakera = data.get("use_lakera", False)
     use_lakera_outbound = data.get("use_lakera_outbound", False)
 
-    import sys
-    sys.stderr.write(f"DEBUG: prompt={prompt}, use_lakera={use_lakera}, use_lakera_outbound={use_lakera_outbound}\n")
-    sys.stderr.flush()
+    logging.info(f"Analyze request: {prompt[:100]}...")
 
     if not prompt:
         return jsonify({"error": "Prompt is required"}), 400
@@ -1554,17 +1552,9 @@ def analyze():
             or os.getenv("DEMO_PROJECT_ID"),
             "breakdown": True,
         }
-        sys.stderr.write(f"DEBUG: Lakera URL={url}\n")
-        sys.stderr.flush()
         try:
-            sys.stderr.write(f"DEBUG: Sending Lakera payload={json.dumps(payload)}\n")
-            sys.stderr.flush()
             response = requests.post(url, headers=headers, json=payload)
-            sys.stderr.write(f"DEBUG: Lakera Status Code={response.status_code}\n")
-            sys.stderr.flush()
             if response.status_code != 200:
-                sys.stderr.write(f"DEBUG: Lakera Error Body={response.text}\n")
-                sys.stderr.flush()
                 logging.error(f"Lakera API Error {response.status_code}: {response.text}")
                 
             response.raise_for_status()
