@@ -30,7 +30,7 @@
                 </div>
 
             </div>
-            <div style="flex: 1; display: flex; gap: 0.5rem;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
                 <select id="provider-select" class="styled-select">
                     <option value="azure" selected>Azure OpenAI</option>
                     <option value="openai">OpenAI</option>
@@ -38,9 +38,12 @@
                     <option value="ollama">Ollama (Local LLMs)</option>
                 </select>
 
-                <select id="model-select" class="styled-select">
-                    <!-- Populated by JS -->
-                </select>
+                <div class="model-selection-group" style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
+                    <input type="text" id="model-search" class="styled-select" placeholder="Search models..." style="margin-bottom: 0;">
+                    <select id="model-select" class="styled-select">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
             </div>
             <button id="set-default-btn" class="secondary-btn" style="padding: 0.75rem 1rem;"
                 title="Save as default preference">

@@ -367,7 +367,7 @@ def load_recent_logs_from_db():
 def get_available_models(api_key):
     """Helper function to fetch available OpenAI models with caching"""
     if not api_key:
-        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+        return []
 
     # Check cache
     now = datetime.now()
@@ -383,24 +383,17 @@ def get_available_models(api_key):
         )
         if response.status_code == 200:
             models = response.json().get("data", [])
-            # Include all chat models (gpt, o1) and fine-tuned models
-            chat_models = [
-                m["id"]
-                for m in models
-                if "gpt" in m["id"]
-                or m["id"].startswith("o1")
-                or m["id"].startswith("ft:")
-            ]
-            result = sorted(chat_models, reverse=True)
+            all_models = [m["id"] for m in models]
+            result = sorted(all_models, reverse=True)
 
             # Update cache
             MODEL_CACHE["openai"]["data"] = result
             MODEL_CACHE["openai"]["timestamp"] = now
             return result
 
-        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+        return []
     except:
-        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+        return []
 
 
 def get_gemini_models():
@@ -435,19 +428,9 @@ def get_gemini_models():
 
         gen_models = []
         for m in models:
-            # More permissive filtering for the playground
+            # Show all available models
             name = m.name.replace("models/", "")
-            supp = (
-                getattr(m, "supported_methods", [])
-                or getattr(m, "supported_generation_methods", [])
-                or getattr(m, "supported_actions", [])
-            )
-
-            # If it supports contents or text generation
-            if any(act in supp for act in ["generateContent", "generateText", "chat"]):
-                gen_models.append(name)
-            elif "gemini" in name.lower():  # Fallback for gemini models
-                gen_models.append(name)
+            gen_models.append(name)
 
         result = sorted(list(set(gen_models)), reverse=True)
 
@@ -457,12 +440,7 @@ def get_gemini_models():
         return result
     except Exception as e:
         logging.error(f"Error fetching Gemini models: {e}")
-        return [
-            "gemini-flash-lite-latest",
-            "gemini-1.5-flash",
-            "gemini-1.5-pro",
-            "gemini-pro",
-        ]
+        return []
 
 
 def get_ollama_models():
