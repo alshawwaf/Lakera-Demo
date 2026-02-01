@@ -613,19 +613,6 @@ def playground():
     )
 
 
-@app.route("/debug_models")
-def debug_models_fetch():
-    openai_key = get_setting("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY", "")
-    o_models = get_available_models(openai_key)
-    g_models = get_gemini_models()
-    return {
-        "openai_count": len(o_models),
-        "gemini_count": len(g_models),
-        "openai_key_found": bool(openai_key),
-        "gemini_key_found": bool(os.getenv("GEMINI_API_KEY") or get_setting("GEMINI_API_KEY"))
-    }
-
-
 @app.route("/dashboard")
 @login_required
 def dashboard():
