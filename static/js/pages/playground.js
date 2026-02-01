@@ -15,84 +15,148 @@ export function initPlayground() {
     const charCount = document.querySelector(".char-count");
     const examplesContainer = document.getElementById("examples-container");
     const providerSelect = document.getElementById("provider-select");
-    const modelSelect = document.getElementById("model-select");
-    const setDefaultBtn = document.getElementById("set-default-btn");
+    const modelSelect = document.getElementById("model-select"); // original hidden select
+    const modelWrapper = document.getElementById("model-select-wrapper");
+    const modelTrigger = document.getElementById("model-select-trigger");
+    const modelDropdown = document.getElementById("model-dropdown-list");
+    const modelOptions = document.getElementById("model-options");
+    const modelSearchInput = document.getElementById("model-search");
+    const selectedModelText = document.getElementById("selected-model-text");
 
-    // Helper to populate models
+    // Helper to toggle dropdown
+    function toggleDropdown(show) {
+        if (!modelWrapper || !modelDropdown) return;
+        if (show === undefined) show = modelDropdown.classList.contains("hidden");
+        
+        if (show) {
+            modelDropdown.classList.remove("hidden");
+            modelWrapper.classList.add("open");
+            if (modelSearchInput) {
+                modelSearchInput.value = "";
+                filterOptions("");
+                setTimeout(() => modelSearchInput.focus(), 10);
+            }
+        } else {
+            modelDropdown.classList.add("hidden");
+            modelWrapper.classList.remove("open");
+        }
+    }
+
+    // Filter options
+    function filterOptions(term) {
+        if (!modelOptions) return;
+        const options = modelOptions.querySelectorAll(".option-item");
+        let visibleCount = 0;
+        
+        options.forEach(opt => {
+            const matches = opt.dataset.value.toLowerCase().includes(term.toLowerCase());
+            opt.classList.toggle("hidden", !matches);
+            if (matches) visibleCount++;
+        });
+
+        // Add "no results" if needed
+        let noRes = modelOptions.querySelector(".no-results");
+        if (visibleCount === 0) {
+            if (!noRes) {
+                noRes = document.createElement("div");
+                noRes.className = "no-results";
+                noRes.textContent = "No models match your search";
+                modelOptions.appendChild(noRes);
+            }
+            noRes.classList.remove("hidden");
+        } else if (noRes) {
+            noRes.classList.add("hidden");
+        }
+    }
+
+    // Populate models
     function populateModels() {
-        if (!providerSelect || !modelSelect || !window.llmData) return;
+        if (!providerSelect || !modelOptions || !window.llmData) return;
 
         const provider = providerSelect.value;
         const data = window.llmData[provider];
-        const modelSearch = document.getElementById("model-search");
         
-        // Reset search
-        if (modelSearch) modelSearch.value = "";
-        modelSelect.innerHTML = "";
+        modelOptions.innerHTML = "";
+        selectedModelText.textContent = "Select a model...";
 
         if (provider === 'azure') {
-            const option = document.createElement("option");
-            option.value = data.deployment;
-            option.textContent = data.deployment;
-            modelSelect.appendChild(option);
-            modelSelect.disabled = true;
-            if (modelSearch) modelSearch.disabled = true;
+            const modelName = data.deployment;
+            addOption(modelName);
+            updateSelection(modelName);
+            modelWrapper.style.pointerEvents = "none";
+            modelWrapper.style.opacity = "0.7";
         } else {
-            modelSelect.disabled = false;
-            if (modelSearch) modelSearch.disabled = false;
+            modelWrapper.style.pointerEvents = "auto";
+            modelWrapper.style.opacity = "1";
 
             if (Array.isArray(data) && data.length > 0) {
-                data.forEach(model => {
-                    const option = document.createElement("option");
-                    option.value = model;
-                    option.textContent = model;
-                    modelSelect.appendChild(option);
-                });
+                data.forEach(model => addOption(model));
 
-                // Select logic: 
+                // Selection logic logic
                 const savedModel = localStorage.getItem("default_model");
+                let targetModel = data[0];
 
                 if (provider === 'openai' && data.includes('gpt-3.5-turbo')) {
-                    modelSelect.value = 'gpt-3.5-turbo';
+                    targetModel = 'gpt-3.5-turbo';
                 } else if (provider === 'gemini' && data.includes('gemini-flash-lite-latest')) {
-                    modelSelect.value = 'gemini-flash-lite-latest';
+                    targetModel = 'gemini-flash-lite-latest';
                 } else if (savedModel && data.includes(savedModel)) {
-                    modelSelect.value = savedModel;
-                } else {
-                    modelSelect.value = data[0];
+                    targetModel = savedModel;
                 }
+                
+                updateSelection(targetModel);
             } else {
-                const option = document.createElement("option");
-                option.value = "";
-                option.textContent = provider === 'ollama' ? "No connection to server" : "No models available";
-                option.disabled = true;
-                option.selected = true;
-                modelSelect.appendChild(option);
-                modelSelect.disabled = true;
+                selectedModelText.textContent = provider === 'ollama' ? "No connection" : "No models available";
+                modelWrapper.style.pointerEvents = "none";
+                modelWrapper.style.opacity = "0.7";
             }
         }
     }
 
-    // Search filtering logic
-    const modelSearch = document.getElementById("model-search");
-    if (modelSearch && modelSelect) {
-        modelSearch.addEventListener("input", (e) => {
-            const term = e.target.value.toLowerCase();
-            const options = modelSelect.querySelectorAll("option");
-            let firstVisible = null;
+    function addOption(value) {
+        const div = document.createElement("div");
+        div.className = "option-item";
+        div.textContent = value;
+        div.dataset.value = value;
+        div.onclick = (e) => {
+            e.stopPropagation();
+            updateSelection(value);
+            toggleDropdown(false);
+        };
+        modelOptions.appendChild(div);
+    }
 
-            options.forEach(opt => {
-                if (opt.disabled) return;
-                const matches = opt.value.toLowerCase().includes(term);
-                opt.style.display = matches ? "" : "none";
-                if (matches && !firstVisible) firstVisible = opt;
-            });
-
-            // Auto-select first match if current selection is hidden
-            if (firstVisible && modelSelect.selectedOptions[0]?.style.display === "none") {
-                modelSelect.value = firstVisible.value;
-            }
+    function updateSelection(value) {
+        if (!modelSelect || !selectedModelText) return;
+        modelSelect.value = value;
+        selectedModelText.textContent = value;
+        
+        // Highlight in list
+        modelOptions.querySelectorAll(".option-item").forEach(opt => {
+            opt.classList.toggle("selected", opt.dataset.value === value);
         });
+    }
+
+    // Set up listeners
+    if (modelTrigger) {
+        modelTrigger.onclick = (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        };
+    }
+
+    if (modelSearchInput) {
+        modelSearchInput.onclick = (e) => e.stopPropagation();
+        modelSearchInput.oninput = (e) => filterOptions(e.target.value);
+    }
+
+    // Close on click outside
+    document.addEventListener("click", () => toggleDropdown(false));
+
+    // Initial population
+    if (providerSelect) {
+        providerSelect.addEventListener("change", populateModels);
+        populateModels();
     }
 
     // Initial Load & Event Listeners

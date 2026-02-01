@@ -38,12 +38,22 @@
                     <option value="ollama">Ollama (Local LLMs)</option>
                 </select>
 
-                <div class="model-selection-group" style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
-                    <input type="text" id="model-search" class="styled-select" placeholder="Search models..." style="margin-bottom: 0;">
-                    <select id="model-select" class="styled-select">
-                        <!-- Populated by JS -->
-                    </select>
+                <div class="custom-select-container" id="model-select-wrapper">
+                    <div class="custom-select-trigger" id="model-select-trigger">
+                        <span id="selected-model-text">Select a model...</span>
+                        <span class="chevron"></span>
+                    </div>
+                    <div class="custom-select-dropdown hidden" id="model-dropdown-list">
+                        <div class="search-box">
+                            <input type="text" id="model-search" placeholder="Search models..." autocomplete="off">
+                        </div>
+                        <div class="options-container" id="model-options">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                 </div>
+                <!-- Hidden input to keep existing form logic working if needed -->
+                <input type="hidden" id="model-select" value="">
             </div>
             <button id="set-default-btn" class="secondary-btn" style="padding: 0.75rem 1rem;"
                 title="Save as default preference">
