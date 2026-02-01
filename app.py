@@ -366,7 +366,6 @@ def load_recent_logs_from_db():
 
 def get_available_models(api_key):
     """Helper function to fetch available OpenAI models with caching"""
-    logging.info(f"Fetching OpenAI models. Key present: {bool(api_key)}")
     if not api_key:
         return []
 
@@ -434,7 +433,6 @@ def get_gemini_models():
             gen_models.append(name)
 
         result = sorted(list(set(gen_models)), reverse=True)
-        logging.info(f"Returning {len(result)} Gemini models")
 
         # Update cache
         MODEL_CACHE["gemini"]["data"] = result
