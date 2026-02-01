@@ -67,14 +67,6 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev_secret_key")
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-logger = logging.getLogger(__name__)
-
 # --- Flask-Login Configuration ---
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -374,10 +366,8 @@ def load_recent_logs_from_db():
 
 def get_available_models(api_key):
     """Helper function to fetch available OpenAI models with caching"""
-    logging.info(f"Fetching OpenAI models. Key present: {bool(api_key)}")
     if not api_key:
-        logging.warning("No OpenAI API key found for model fetching")
-        return []
+        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
 
     # Check cache
     now = datetime.now()
@@ -386,36 +376,37 @@ def get_available_models(api_key):
             return MODEL_CACHE["openai"]["data"]
 
     try:
-        logging.info("Requesting models from OpenAI API...")
         response = requests.get(
             "https://api.openai.com/v1/models",
             headers={"Authorization": f"Bearer {api_key}"},
-            timeout=5,
+            timeout=2,  # Reduced timeout
         )
         if response.status_code == 200:
             models = response.json().get("data", [])
-            all_models = [m["id"] for m in models]
-            logging.info(f"OpenAI returned {len(all_models)} models")
-            result = sorted(all_models, reverse=True)
+            # Include all chat models (gpt, o1) and fine-tuned models
+            chat_models = [
+                m["id"]
+                for m in models
+                if "gpt" in m["id"]
+                or m["id"].startswith("o1")
+                or m["id"].startswith("ft:")
+            ]
+            result = sorted(chat_models, reverse=True)
 
             # Update cache
             MODEL_CACHE["openai"]["data"] = result
             MODEL_CACHE["openai"]["timestamp"] = now
             return result
 
-        logging.error(f"OpenAI API error: {response.status_code} - {response.text}")
-        return []
-    except Exception as e:
-        logging.error(f"Exception during OpenAI model fetch: {e}")
-        return []
+        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
+    except:
+        return ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"]
 
 
 def get_gemini_models():
     """Helper function to fetch available Gemini models with caching"""
     api_key = get_setting("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
-    logging.info(f"Fetching Gemini models. Key present: {bool(api_key)}")
     if not api_key:
-        logging.warning("No Gemini API key found for model fetching")
         return []
 
     # Check cache
@@ -425,19 +416,40 @@ def get_gemini_models():
             return MODEL_CACHE["gemini"]["data"]
 
     try:
-        logging.info("Requesting models from Gemini API (GenAI SDK)...")
         client = genai.Client(api_key=api_key)
         models = list(client.models.list())
-        logging.info(f"Gemini API returned {len(models)} models")
+
+        # Debug: check first model
+        if models:
+            m = models[0]
+            logging.info(f"[DEBUG] First Gemini model: {m.name}, Attributes: {dir(m)}")
+            # Log supported methods if they exist
+            supp_meth = (
+                getattr(m, "supported_methods", [])
+                or getattr(m, "supported_generation_methods", [])
+                or getattr(m, "supported_actions", [])
+            )
+            logging.info(
+                f"[DEBUG] Model {m.name} supported methods/actions: {supp_meth}"
+            )
 
         gen_models = []
         for m in models:
-            # User requested all models available via the license, no filtering
+            # More permissive filtering for the playground
             name = m.name.replace("models/", "")
-            gen_models.append(name)
+            supp = (
+                getattr(m, "supported_methods", [])
+                or getattr(m, "supported_generation_methods", [])
+                or getattr(m, "supported_actions", [])
+            )
+
+            # If it supports contents or text generation
+            if any(act in supp for act in ["generateContent", "generateText", "chat"]):
+                gen_models.append(name)
+            elif "gemini" in name.lower():  # Fallback for gemini models
+                gen_models.append(name)
 
         result = sorted(list(set(gen_models)), reverse=True)
-        logging.info(f"Returning {len(result)} unsorted Gemini models: {result[:5]}...")
 
         # Update cache
         MODEL_CACHE["gemini"]["data"] = result
@@ -445,7 +457,12 @@ def get_gemini_models():
         return result
     except Exception as e:
         logging.error(f"Error fetching Gemini models: {e}")
-        return []
+        return [
+            "gemini-flash-lite-latest",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+            "gemini-pro",
+        ]
 
 
 def get_ollama_models():

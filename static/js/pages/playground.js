@@ -24,10 +24,7 @@ export function initPlayground() {
 
         const provider = providerSelect.value;
         const data = window.llmData[provider];
-        const modelSearch = document.getElementById("model-search");
-        
-        // Reset search
-        if (modelSearch) modelSearch.value = "";
+
         modelSelect.innerHTML = "";
 
         if (provider === 'azure') {
@@ -36,10 +33,8 @@ export function initPlayground() {
             option.textContent = data.deployment;
             modelSelect.appendChild(option);
             modelSelect.disabled = true;
-            if (modelSearch) modelSearch.disabled = true;
         } else {
             modelSelect.disabled = false;
-            if (modelSearch) modelSearch.disabled = false;
 
             if (Array.isArray(data) && data.length > 0) {
                 data.forEach(model => {
@@ -50,6 +45,10 @@ export function initPlayground() {
                 });
 
                 // Select logic: 
+                // 1. Force OpenAI to gpt-3.5-turbo
+                // 2. Force Gemini to gemini-flash-lite-latest
+                // 3. Fallback to saved model if it exists
+                // 4. Default to first item
                 const savedModel = localStorage.getItem("default_model");
 
                 if (provider === 'openai' && data.includes('gpt-3.5-turbo')) {
@@ -66,33 +65,11 @@ export function initPlayground() {
                 option.value = "";
                 option.textContent = provider === 'ollama' ? "No connection to server" : "No models available";
                 option.disabled = true;
-                option.selected = true;
+                option.selected = true; // Ensure this is the selected text
                 modelSelect.appendChild(option);
                 modelSelect.disabled = true;
             }
         }
-    }
-
-    // Search filtering logic
-    const modelSearch = document.getElementById("model-search");
-    if (modelSearch && modelSelect) {
-        modelSearch.addEventListener("input", (e) => {
-            const term = e.target.value.toLowerCase();
-            const options = modelSelect.querySelectorAll("option");
-            let firstVisible = null;
-
-            options.forEach(opt => {
-                if (opt.disabled) return;
-                const matches = opt.value.toLowerCase().includes(term);
-                opt.style.display = matches ? "" : "none";
-                if (matches && !firstVisible) firstVisible = opt;
-            });
-
-            // Auto-select first match if current selection is hidden
-            if (firstVisible && modelSelect.selectedOptions[0]?.style.display === "none") {
-                modelSelect.value = firstVisible.value;
-            }
-        });
     }
 
     // Initial Load & Event Listeners
