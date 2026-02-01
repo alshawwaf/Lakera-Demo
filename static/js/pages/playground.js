@@ -23,6 +23,8 @@ export function initPlayground() {
     const modelSearchInput = document.getElementById("model-search");
     const selectedModelText = document.getElementById("selected-model-text");
 
+    const setDefaultBtn = document.getElementById("set-default-btn");
+
     // Helper to toggle dropdown
     function toggleDropdown(show) {
         if (!modelWrapper || !modelDropdown) return;
@@ -153,29 +155,23 @@ export function initPlayground() {
     // Close on click outside
     document.addEventListener("click", () => toggleDropdown(false));
 
-    // Initial population
-    if (providerSelect) {
-        providerSelect.addEventListener("change", populateModels);
-        populateModels();
-    }
-
     // Initial Load & Event Listeners
     if (providerSelect) {
         providerSelect.addEventListener("change", populateModels);
-        populateModels(); // Initial population
-
+        
         // Load defaults
         const savedProvider = localStorage.getItem("default_provider");
         const savedModel = localStorage.getItem("default_model");
 
         if (savedProvider) {
             providerSelect.value = savedProvider;
-            populateModels(); // This now handles the specific defaults for OpenAI/Gemini
+            populateModels();
 
             // Only override if the provider isn't one of the 'forced default' ones
             const isForcedDefault = savedProvider === 'openai' || savedProvider === 'gemini';
-            if (savedModel && providerSelect.value !== 'azure' && !isForcedDefault && modelSelect.querySelector(`option[value="${savedModel}"]`)) {
-                modelSelect.value = savedModel;
+            const availableModels = window.llmData[savedProvider];
+            if (savedModel && providerSelect.value !== 'azure' && !isForcedDefault && Array.isArray(availableModels) && availableModels.includes(savedModel)) {
+                updateSelection(savedModel);
             }
         } else {
             providerSelect.value = "azure";
