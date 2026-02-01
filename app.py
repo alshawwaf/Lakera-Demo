@@ -1555,9 +1555,13 @@ def analyze():
             or os.getenv("DEMO_PROJECT_ID"),
             "breakdown": True,
         }
+        print(f"DEBUG: Lakera URL={url}", flush=True)
         try:
+            print(f"DEBUG: Sending Lakera payload={json.dumps(payload)}", flush=True)
             response = requests.post(url, headers=headers, json=payload)
+            print(f"DEBUG: Lakera Status Code={response.status_code}", flush=True)
             if response.status_code != 200:
+                print(f"DEBUG: Lakera Error Body={response.text}", flush=True)
                 logging.error(f"Lakera API Error {response.status_code}: {response.text}")
                 
             response.raise_for_status()
@@ -1568,6 +1572,7 @@ def analyze():
                 lakera_flagged = True
 
         except requests.exceptions.RequestException as e:
+            print(f"DEBUG: Lakera Exception={e}", flush=True)
             logging.error(f"Lakera API Exception: {e}")
             if hasattr(e, 'response') and e.response is not None:
                  logging.error(f"Lakera API Response: {e.response.text}")
