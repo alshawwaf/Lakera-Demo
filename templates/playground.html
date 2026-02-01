@@ -30,25 +30,29 @@
                 </div>
 
             </div>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
-                <select id="provider-select" class="styled-select">
-                    <option value="azure" selected>Azure OpenAI</option>
-                    <option value="openai">OpenAI</option>
-                    <option value="gemini">Google Gemini</option>
-                    <option value="ollama">Ollama (Local LLMs)</option>
-                </select>
+            <div style="flex: 1; display: flex; flex-direction: row; gap: 1rem; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <select id="provider-select" class="styled-select" style="width: 100%;">
+                        <option value="azure" selected>Azure OpenAI</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="ollama">Ollama (Local LLMs)</option>
+                    </select>
+                </div>
 
-                <div class="custom-select-container" id="model-select-wrapper">
-                    <div class="custom-select-trigger" id="model-select-trigger">
-                        <span id="selected-model-text">Select a model...</span>
-                        <span class="chevron"></span>
-                    </div>
-                    <div class="custom-select-dropdown hidden" id="model-dropdown-list">
-                        <div class="search-box">
-                            <input type="text" id="model-search" placeholder="Search models..." autocomplete="off">
+                <div style="flex: 1;">
+                    <div class="custom-select-container" id="model-select-wrapper">
+                        <div class="custom-select-trigger" id="model-select-trigger">
+                            <span id="selected-model-text">Select a model...</span>
+                            <span class="chevron"></span>
                         </div>
-                        <div class="options-container" id="model-options">
-                            <!-- Populated by JS -->
+                        <div class="custom-select-dropdown hidden" id="model-dropdown-list">
+                            <div class="search-box">
+                                <input type="text" id="model-search" placeholder="Search models..." autocomplete="off">
+                            </div>
+                            <div class="options-container" id="model-options">
+                                <!-- Populated by JS -->
+                            </div>
                         </div>
                     </div>
                 </div>
