@@ -734,20 +734,25 @@ def get_api_settings():
     """
     Get current configuration for the frontend.
     """
+    demo_api_key = get_setting("DEMO_API_KEY") or os.getenv("DEMO_API_KEY", "")
+    demo_project_id = get_setting("DEMO_PROJECT_ID") or os.getenv("DEMO_PROJECT_ID", "")
+    azure_api_key = get_setting("AZURE_OPENAI_API_KEY") or os.getenv("AZURE_OPENAI_API_KEY", "")
+    azure_endpoint = get_setting("AZURE_OPENAI_ENDPOINT") or os.getenv("AZURE_OPENAI_ENDPOINT", "")
+    azure_deployment = get_setting("AZURE_OPENAI_DEPLOYMENT") or os.getenv("AZURE_OPENAI_DEPLOYMENT", "")
+
     return jsonify(
         {
-            "DEMO_API_KEY": get_setting("DEMO_API_KEY")
-            or os.getenv("DEMO_API_KEY", ""),
-            "DEMO_PROJECT_ID": get_setting("DEMO_PROJECT_ID")
-            or os.getenv("DEMO_PROJECT_ID", ""),
-            "LAKERA_API_KEY": get_setting("DEMO_API_KEY")
-            or os.getenv("DEMO_API_KEY", ""),  # Backward compatibility for JS
+            "DEMO_API_KEY": demo_api_key,
+            "DEMO_PROJECT_ID": demo_project_id,
+            "LAKERA_API_KEY": demo_api_key,  # Backward compatibility for JS
             "AZURE_CONTENT_SAFETY_KEY": get_setting("AZURE_CONTENT_SAFETY_KEY")
             or os.getenv("AZURE_CONTENT_SAFETY_KEY", ""),
             "AZURE_CONTENT_SAFETY_ENDPOINT": get_setting(
                 "AZURE_CONTENT_SAFETY_ENDPOINT"
             )
             or os.getenv("AZURE_CONTENT_SAFETY_ENDPOINT", ""),
+            "lakera_configured": bool(demo_api_key and demo_project_id),
+            "azure_configured": bool(azure_api_key and azure_endpoint and azure_deployment)
         }
     )
 
@@ -1552,6 +1557,9 @@ def analyze():
         }
         try:
             response = requests.post(url, headers=headers, json=payload)
+            if response.status_code != 200:
+                logging.error(f"Lakera API Error {response.status_code}: {response.text}")
+                
             response.raise_for_status()
             lakera_result = response.json()
             logging.info(f"Inbound: {prompt}\tSuccess\t{json.dumps(lakera_result)}")
@@ -1560,7 +1568,9 @@ def analyze():
                 lakera_flagged = True
 
         except requests.exceptions.RequestException as e:
-            logging.error(f"Lakera API Error: {e}")
+            logging.error(f"Lakera API Exception: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                 logging.error(f"Lakera API Response: {e.response.text}")
 
     # 2. OpenAI Chat (If safe or skipped)
     openai_response = None

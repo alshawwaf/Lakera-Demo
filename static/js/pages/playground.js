@@ -159,6 +159,30 @@ export function initPlayground() {
     if (providerSelect) {
         providerSelect.addEventListener("change", populateModels);
         
+        // Fetch API settings to check configuration
+        fetch("/api/settings")
+            .then(res => res.json())
+            .then(settings => {
+                const lakeraInbound = document.getElementById("lakera-scan-checkbox");
+                const lakeraOutbound = document.getElementById("lakera-outbound-checkbox");
+                
+                if (!settings.lakera_configured) {
+                    if (lakeraInbound) {
+                        lakeraInbound.disabled = true;
+                        lakeraInbound.parentElement.title = "Lakera API Key and Project ID required in Settings";
+                        lakeraInbound.parentElement.style.opacity = "0.5";
+                        lakeraInbound.parentElement.style.cursor = "not-allowed";
+                    }
+                    if (lakeraOutbound) {
+                        lakeraOutbound.disabled = true;
+                        lakeraOutbound.parentElement.title = "Lakera API Key and Project ID required in Settings";
+                        lakeraOutbound.parentElement.style.opacity = "0.5";
+                        lakeraOutbound.parentElement.style.cursor = "not-allowed";
+                    }
+                }
+            })
+            .catch(err => console.error("Error fetching settings:", err));
+
         // Load defaults
         const savedProvider = localStorage.getItem("default_provider");
         const savedModel = localStorage.getItem("default_model");
