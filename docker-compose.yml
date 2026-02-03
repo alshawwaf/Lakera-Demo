@@ -5,7 +5,6 @@ services:
   # Main application
   web:
     build: .
-    container_name: lakera-demo-app
     ports:
       - "${APP_PORT:-9000}:${APP_PORT:-9000}"
     environment:
@@ -72,7 +71,6 @@ services:
   # Redis for distributed rate limiting
   redis:
     image: redis:7-alpine
-    container_name: lakera-demo-redis
     command: redis-server --appendonly yes
     ports:
       - "6379:6379"
@@ -93,7 +91,6 @@ services:
   # Redis Commander - Web UI for Redis
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: lakera-demo-redis-ui
     environment:
       - REDIS_HOSTS=local:redis:6379
     ports:
@@ -110,7 +107,6 @@ services:
   # Nginx reverse proxy (optional - for production)
   nginx:
     image: nginx:alpine
-    container_name: lakera-demo-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -131,7 +127,6 @@ services:
   # Automated backup service
   backup:
     build: .
-    container_name: lakera-demo-backup
     command: >
       sh -c "while true; do
         python scripts/backup_db.py;
