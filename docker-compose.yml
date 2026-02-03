@@ -94,7 +94,7 @@ services:
     environment:
       - REDIS_HOSTS=local:redis:6379
     ports:
-      - "8081:8081"
+      - "8082:8081"
     networks:
       - lakera-network
     depends_on:
